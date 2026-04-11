@@ -1,0 +1,186 @@
+/* ── Google Fonts ─────────────────────────────────────────── */
+/* Outfit + DM Sans loaded via index.html */
+
+/* ── CSS Custom Properties ────────────────────────────────── */
+:root {
+  /* Colors */
+  --color-bg:           #0A0A0F;
+  --color-surface:      #14141F;
+  --color-surface-2:    #1C1C2E;
+  --color-border:       rgba(255, 255, 255, 0.06);
+  --color-border-hover: rgba(255, 255, 255, 0.12);
+
+  --color-accent:       #00E5CC;
+  --color-accent-dim:   rgba(0, 229, 204, 0.15);
+  --color-accent-glow:  rgba(0, 229, 204, 0.4);
+
+  --color-red:          #FF4757;
+  --color-red-dim:      rgba(255, 71, 87, 0.15);
+  --color-red-glow:     rgba(255, 71, 87, 0.4);
+
+  --color-yellow:       #FFBE0B;
+  --color-yellow-dim:   rgba(255, 190, 11, 0.15);
+
+  --color-green:        #06D6A0;
+  --color-green-dim:    rgba(6, 214, 160, 0.15);
+
+  --color-text:         #F8F8F2;
+  --color-text-muted:   #8B8B9E;
+  --color-text-dim:     #4A4A6A;
+
+  /* Typography */
+  --font-heading: 'Outfit', sans-serif;
+  --font-body:    'DM Sans', sans-serif;
+
+  /* Spacing */
+  --radius-sm:  6px;
+  --radius-md:  12px;
+  --radius-lg:  20px;
+
+  /* Easing */
+  --ease-athletic: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Transitions */
+  --transition-fast:   0.15s var(--ease-athletic);
+  --transition-normal: 0.25s var(--ease-athletic);
+  --transition-slow:   0.4s  var(--ease-athletic);
+}
+
+/* ── Global Reset ─────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  line-height: 1.2;
+  color: var(--color-text);
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: var(--font-body);
+}
+
+input, select, textarea {
+  font-family: var(--font-body);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img, svg {
+  display: block;
+}
+
+/* ── Shared Keyframes ─────────────────────────────────────── */
+
+/* Hologram breathing glow */
+@keyframes hologram-breathe {
+  0%, 100% {
+    filter:
+      drop-shadow(0 0 4px var(--color-accent))
+      drop-shadow(0 0 10px var(--color-accent-glow));
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 8px var(--color-accent))
+      drop-shadow(0 0 20px var(--color-accent-glow))
+      drop-shadow(0 0 40px rgba(0, 229, 204, 0.2));
+  }
+}
+
+/* Sonar ping on priority joints */
+@keyframes pulse-ring {
+  0%   { r: 10; opacity: 0.9; stroke-width: 2; }
+  100% { r: 28; opacity: 0;   stroke-width: 0.5; }
+}
+
+/* Continuous scan line sweep */
+@keyframes scan-sweep {
+  0%   { transform: translateY(-10px); opacity: 0; }
+  8%   { opacity: 0.5; }
+  92%  { opacity: 0.5; }
+  100% { transform: translateY(460px); opacity: 0; }
+}
+
+/* Readiness ring fill */
+@keyframes ring-fill {
+  from { stroke-dashoffset: var(--ring-full); }
+  to   { stroke-dashoffset: var(--ring-target); }
+}
+
+/* Shimmer for loading skeleton */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+/* Pulse on analyze button */
+@keyframes btn-pulse {
+  0%, 100% { transform: scale(1);    box-shadow: 0 0 0 0 var(--color-accent-glow); }
+  50%       { transform: scale(1.02); box-shadow: 0 0 20px 4px var(--color-accent-glow); }
+}
+
+/* Fade-in for route transitions */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Utility Classes ──────────────────────────────────────── */
+.fade-in {
+  animation: fade-in 0.3s var(--ease-athletic) both;
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface) 25%,
+    var(--color-surface-2) 50%,
+    var(--color-surface) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.6s infinite linear;
+}
+
+/* ── App Layout ───────────────────────────────────────────── */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}

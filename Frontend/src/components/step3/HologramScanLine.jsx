@@ -3,8 +3,8 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 const PERIOD = 4;     // seconds per sweep
-const TOP    =  1.8;  // just above the head
-const BOTTOM = -1.1;  // just below the feet
+const TOP    =  1.0;  // just above the head (model normalized to ±0.9)
+const BOTTOM = -1.0;  // just below the feet
 
 export default function HologramScanLine() {
   const meshRef = useRef();
@@ -23,7 +23,7 @@ export default function HologramScanLine() {
 
   return (
     <mesh ref={meshRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, TOP, 0]}>
-      <planeGeometry args={[1.0, 0.014]} />
+      <planeGeometry args={[0.8, 0.012]} />
       <meshBasicMaterial
         color="#00E5CC"
         transparent

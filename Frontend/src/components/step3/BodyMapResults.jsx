@@ -8,9 +8,15 @@ import './BodyMapResults.css';
 
 const SPORTS = Object.entries(sportBlueprints).map(([id, { name, emoji }]) => ({ id, name, emoji }));
 
+const GENDER_MODELS = {
+  male:   '/models/male_body.glb',
+  female: '/models/female_muscle_human_body.glb',
+};
+
 export default function BodyMapResults() {
   const { selectedSport, gapAnalysis, switchSport } = useApp();
   const [isLoading, setIsLoading] = useState(true);
+  const [gender, setGender] = useState('male');
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 2500);
@@ -20,6 +26,25 @@ export default function BodyMapResults() {
   return (
     <div className="body-map-results fade-in">
       <div className="page-container">
+
+        {/* Gender toggle */}
+        <div className="gender-toggle-row">
+          <span className="sport-switcher-label">Model:</span>
+          <div className="gender-toggle">
+            <button
+              className={`gender-btn ${gender === 'male' ? 'active' : ''}`}
+              onClick={() => setGender('male')}
+            >
+              ♂ Male
+            </button>
+            <button
+              className={`gender-btn ${gender === 'female' ? 'active' : ''}`}
+              onClick={() => setGender('female')}
+            >
+              ♀ Female
+            </button>
+          </div>
+        </div>
 
         {/* Sport switcher */}
         <div className="sport-switcher">
@@ -46,7 +71,7 @@ export default function BodyMapResults() {
               <ScanAnimation />
             ) : (
               <>
-                <HologramBodyMap gapAnalysis={gapAnalysis} />
+                <HologramBodyMap gapAnalysis={gapAnalysis} modelUrl={GENDER_MODELS[gender]} />
                 <div className="body-map-legend">
                   <div className="legend-row">
                     <span className="legend-dot legend-teal" />
