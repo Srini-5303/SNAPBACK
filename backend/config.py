@@ -1,0 +1,173 @@
+# All constants: sport blueprints, demo mobility data, scoring thresholds
+
+SPORT_BLUEPRINTS = {
+    "tennis": {
+        "name": "Tennis",
+        "tag": "Upper body dominant",
+        "emoji": "🎾",
+        "joints": {
+            "shoulder_external_rotation": {"required": 90,  "label": "Shoulder External Rotation"},
+            "shoulder_flexion":           {"required": 170, "label": "Shoulder Flexion"},
+            "thoracic_rotation":          {"required": 45,  "label": "Thoracic Rotation"},
+            "hip_flexion":                {"required": 120, "label": "Hip Flexion"},
+            "hip_internal_rotation":      {"required": 35,  "label": "Hip Internal Rotation"},
+            "knee_flexion":               {"required": 130, "label": "Knee Flexion"},
+            "ankle_dorsiflexion":         {"required": 20,  "label": "Ankle Dorsiflexion"},
+            "wrist_extension":            {"required": 70,  "label": "Wrist Extension"},
+        },
+    },
+    "soccer": {
+        "name": "Soccer",
+        "tag": "Full body explosive",
+        "emoji": "⚽",
+        "joints": {
+            "hip_flexion":           {"required": 130, "label": "Hip Flexion"},
+            "hip_extension":         {"required": 30,  "label": "Hip Extension"},
+            "hip_internal_rotation": {"required": 40,  "label": "Hip Internal Rotation"},
+            "hip_external_rotation": {"required": 45,  "label": "Hip External Rotation"},
+            "knee_flexion":          {"required": 140, "label": "Knee Flexion"},
+            "ankle_dorsiflexion":    {"required": 25,  "label": "Ankle Dorsiflexion"},
+            "ankle_plantarflexion":  {"required": 50,  "label": "Ankle Plantarflexion"},
+            "thoracic_rotation":     {"required": 40,  "label": "Thoracic Rotation"},
+        },
+    },
+    "basketball": {
+        "name": "Basketball",
+        "tag": "Vertical & lateral power",
+        "emoji": "🏀",
+        "joints": {
+            "shoulder_flexion":           {"required": 170, "label": "Shoulder Flexion"},
+            "shoulder_external_rotation": {"required": 80,  "label": "Shoulder External Rotation"},
+            "hip_flexion":                {"required": 125, "label": "Hip Flexion"},
+            "hip_extension":              {"required": 25,  "label": "Hip Extension"},
+            "knee_flexion":               {"required": 135, "label": "Knee Flexion"},
+            "ankle_dorsiflexion":         {"required": 25,  "label": "Ankle Dorsiflexion"},
+            "thoracic_rotation":          {"required": 40,  "label": "Thoracic Rotation"},
+            "wrist_extension":            {"required": 65,  "label": "Wrist Extension"},
+        },
+    },
+    "swimming": {
+        "name": "Swimming",
+        "tag": "Shoulder mobility critical",
+        "emoji": "🏊",
+        "joints": {
+            "shoulder_flexion":           {"required": 180, "label": "Shoulder Flexion"},
+            "shoulder_extension":         {"required": 60,  "label": "Shoulder Extension"},
+            "shoulder_external_rotation": {"required": 95,  "label": "Shoulder External Rotation"},
+            "shoulder_internal_rotation": {"required": 70,  "label": "Shoulder Internal Rotation"},
+            "thoracic_extension":         {"required": 25,  "label": "Thoracic Extension"},
+            "hip_flexion":                {"required": 120, "label": "Hip Flexion"},
+            "ankle_plantarflexion":       {"required": 55,  "label": "Ankle Plantarflexion"},
+            "ankle_dorsiflexion":         {"required": 15,  "label": "Ankle Dorsiflexion"},
+        },
+    },
+    "running": {
+        "name": "Running",
+        "tag": "Lower body endurance",
+        "emoji": "🏃",
+        "joints": {
+            "hip_flexion":           {"required": 120, "label": "Hip Flexion"},
+            "hip_extension":         {"required": 20,  "label": "Hip Extension"},
+            "knee_flexion":          {"required": 130, "label": "Knee Flexion"},
+            "ankle_dorsiflexion":    {"required": 20,  "label": "Ankle Dorsiflexion"},
+            "ankle_plantarflexion":  {"required": 50,  "label": "Ankle Plantarflexion"},
+            "hip_internal_rotation": {"required": 30,  "label": "Hip Internal Rotation"},
+            "thoracic_rotation":     {"required": 35,  "label": "Thoracic Rotation"},
+            "hip_external_rotation": {"required": 35,  "label": "Hip External Rotation"},
+        },
+    },
+    "crossfit": {
+        "name": "CrossFit",
+        "tag": "Full body strength & power",
+        "emoji": "🏋️",
+        "joints": {
+            "shoulder_flexion":           {"required": 180, "label": "Shoulder Flexion"},
+            "shoulder_external_rotation": {"required": 90,  "label": "Shoulder External Rotation"},
+            "hip_flexion":                {"required": 135, "label": "Hip Flexion"},
+            "hip_external_rotation":      {"required": 45,  "label": "Hip External Rotation"},
+            "knee_flexion":               {"required": 140, "label": "Knee Flexion"},
+            "ankle_dorsiflexion":         {"required": 30,  "label": "Ankle Dorsiflexion"},
+            "thoracic_extension":         {"required": 25,  "label": "Thoracic Extension"},
+            "wrist_extension":            {"required": 75,  "label": "Wrist Extension"},
+        },
+    },
+    "golf": {
+        "name": "Golf",
+        "tag": "Rotational power",
+        "emoji": "⛳",
+        "joints": {
+            "thoracic_rotation":     {"required": 55, "label": "Thoracic Rotation"},
+            "hip_internal_rotation": {"required": 45, "label": "Hip Internal Rotation"},
+            "hip_external_rotation": {"required": 45, "label": "Hip External Rotation"},
+            "hip_flexion":           {"required": 110, "label": "Hip Flexion"},
+            "shoulder_external_rotation": {"required": 85, "label": "Shoulder External Rotation"},
+            "wrist_extension":       {"required": 65, "label": "Wrist Extension"},
+            "ankle_dorsiflexion":    {"required": 20, "label": "Ankle Dorsiflexion"},
+        },
+    },
+    "volleyball": {
+        "name": "Volleyball",
+        "tag": "Explosive overhead",
+        "emoji": "🏐",
+        "joints": {
+            "shoulder_flexion":           {"required": 175, "label": "Shoulder Flexion"},
+            "shoulder_external_rotation": {"required": 90,  "label": "Shoulder External Rotation"},
+            "hip_flexion":                {"required": 120, "label": "Hip Flexion"},
+            "knee_flexion":               {"required": 130, "label": "Knee Flexion"},
+            "ankle_dorsiflexion":         {"required": 25,  "label": "Ankle Dorsiflexion"},
+            "thoracic_rotation":          {"required": 40,  "label": "Thoracic Rotation"},
+            "wrist_extension":            {"required": 65,  "label": "Wrist Extension"},
+        },
+    },
+    "baseball": {
+        "name": "Baseball",
+        "tag": "Rotational & throwing",
+        "emoji": "⚾",
+        "joints": {
+            "shoulder_external_rotation": {"required": 115, "label": "Shoulder External Rotation"},
+            "shoulder_internal_rotation": {"required": 60,  "label": "Shoulder Internal Rotation"},
+            "shoulder_flexion":           {"required": 170, "label": "Shoulder Flexion"},
+            "thoracic_rotation":          {"required": 50,  "label": "Thoracic Rotation"},
+            "hip_internal_rotation":      {"required": 40,  "label": "Hip Internal Rotation"},
+            "hip_external_rotation":      {"required": 45,  "label": "Hip External Rotation"},
+            "wrist_extension":            {"required": 60,  "label": "Wrist Extension"},
+        },
+    },
+    "boxing": {
+        "name": "Boxing",
+        "tag": "Full body rotational",
+        "emoji": "🥊",
+        "joints": {
+            "shoulder_flexion":           {"required": 165, "label": "Shoulder Flexion"},
+            "shoulder_external_rotation": {"required": 75,  "label": "Shoulder External Rotation"},
+            "thoracic_rotation":          {"required": 50,  "label": "Thoracic Rotation"},
+            "hip_internal_rotation":      {"required": 40,  "label": "Hip Internal Rotation"},
+            "hip_external_rotation":      {"required": 40,  "label": "Hip External Rotation"},
+            "knee_flexion":               {"required": 125, "label": "Knee Flexion"},
+            "ankle_dorsiflexion":         {"required": 20,  "label": "Ankle Dorsiflexion"},
+        },
+    },
+}
+
+# Simulated user ROM — stands in for real MediaPipe output until pose.py is wired up
+DEMO_USER_MOBILITY = {
+    "shoulder_flexion":           148,
+    "shoulder_extension":          42,
+    "shoulder_external_rotation":  52,
+    "shoulder_internal_rotation":  55,
+    "thoracic_rotation":           28,
+    "thoracic_extension":          15,
+    "hip_flexion":                 98,
+    "hip_extension":               12,
+    "hip_internal_rotation":       22,
+    "hip_external_rotation":       30,
+    "knee_flexion":               118,
+    "ankle_dorsiflexion":          12,
+    "ankle_plantarflexion":        38,
+    "wrist_extension":             50,
+}
+
+# Scoring thresholds (% of required ROM achieved)
+GREEN_THRESHOLD  = 80   # >= 80% → sport ready
+YELLOW_THRESHOLD = 60   # 60–79% → needs work
+# < 60% → priority focus (red)
