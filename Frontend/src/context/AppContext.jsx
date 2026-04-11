@@ -1,8 +1,8 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useRef, useState } from 'react';
 import { demoUserMobility } from '../data/demoUserMobility.js';
 import { demoExercisePlan } from '../data/demoExercisePlan.js';
 import { computeGapAnalysis } from '../utils/gapAnalysis.js';
-import { fetchSportPreview, analyzeMovement } from '../utils/api.js';
+import { fetchSportPreview, analyzeMovement, generatePlanRequest } from '../utils/api.js';
 
 const AppContext = createContext(null);
 
@@ -13,6 +13,10 @@ export function AppProvider({ children }) {
   const [sportExercises, setSportExercises]         = useState(null);
   const [sportExercisesLoading, setSportExercisesLoading] = useState(false);
   const [analysisLoading, setAnalysisLoading]       = useState(false);
+  const [planLoading, setPlanLoading]               = useState(false);
+
+  // Keep a ref to the latest cvResult so generatePlan can use it
+  const lastCvResult = useRef(null);
 
   function selectSport(sportKey) {
     setSelectedSport(sportKey);
@@ -31,19 +35,37 @@ export function AppProvider({ children }) {
     }
   }
 
-  async function runAnalysis(sportKey) {
+  async function runAnalysis(sportKey, cvResult = null) {
     setAnalysisLoading(true);
+    lastCvResult.current = cvResult;
     try {
-      const { gapAnalysis: ga, exercisePlan: ep } = await analyzeMovement(sportKey);
+      // Run analysis without plan (plan is deferred to generatePlan)
+      const { gapAnalysis: ga } = await analyzeMovement(sportKey, cvResult);
       setGapAnalysis(ga);
-      setExercisePlan(ep);
+      setExercisePlan(null);  // clear stale plan
     } catch {
-      // Fallback to local computation if backend is unavailable
       const ga = computeGapAnalysis(sportKey, demoUserMobility);
       setGapAnalysis(ga);
-      setExercisePlan(demoExercisePlan[sportKey] ?? demoExercisePlan.tennis);
+      setExercisePlan(null);
     } finally {
       setAnalysisLoading(false);
+    }
+  }
+
+  async function generatePlan(userProfile) {
+    if (!selectedSport || !gapAnalysis) return;
+    setPlanLoading(true);
+    try {
+      const { exercisePlan: ep } = await generatePlanRequest(
+        selectedSport,
+        lastCvResult.current,
+        userProfile,
+      );
+      setExercisePlan(ep);
+    } catch {
+      setExercisePlan(demoExercisePlan[selectedSport] ?? demoExercisePlan.tennis);
+    } finally {
+      setPlanLoading(false);
     }
   }
 
@@ -60,9 +82,11 @@ export function AppProvider({ children }) {
       sportExercises,
       sportExercisesLoading,
       analysisLoading,
+      planLoading,
       selectSport,
       loadSportPreview,
       runAnalysis,
+      generatePlan,
       switchSport,
     }}>
       {children}

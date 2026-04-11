@@ -17,12 +17,6 @@ const SPORT_MOVEMENTS = {
     { number: '03', title: 'Forehand Lunge', instruction: 'Step out into a deep lunge reaching your arm across your body', figure: ForwardLungeFigure },
     { number: '04', title: 'Groundstroke Rotation', instruction: 'Arms out, rotate your hips and torso as if swinging through a shot', figure: TrunkRotationFigure },
   ],
-  soccer: [
-    { number: '01', title: 'Aerial Header Reach', instruction: 'Jump and extend both arms up as if meeting a high ball with your head', figure: OverheadReachFigure },
-    { number: '02', title: 'Goalkeeper Crouch', instruction: 'Wide stance, sink low into a goalkeeper ready position', figure: DeepSquatFigure },
-    { number: '03', title: 'Lateral Cut Lunge', instruction: 'Step wide to the side into a deep lunge, each direction', figure: ForwardLungeFigure },
-    { number: '04', title: 'Hip Rotation for Kicking', instruction: 'Hands on hips, rotate through your full hip range each side', figure: TrunkRotationFigure },
-  ],
   basketball: [
     { number: '01', title: 'Jump Shot Reach', instruction: 'Extend both arms overhead as if releasing a jump shot at full extension', figure: OverheadReachFigure },
     { number: '02', title: 'Defensive Stance Squat', instruction: 'Feet wide, drop into a low defensive stance and hold', figure: DeepSquatFigure },
@@ -34,12 +28,6 @@ const SPORT_MOVEMENTS = {
     { number: '02', title: 'Push-Off Streamline Squat', instruction: 'Squat to wall push-off depth with arms pressed together overhead', figure: DeepSquatFigure },
     { number: '03', title: 'Kick Extension Lunge', instruction: 'Step into a long lunge and extend the back leg fully like a kick', figure: ForwardLungeFigure },
     { number: '04', title: 'Body Roll Rotation', instruction: 'Arms extended, rotate your torso side to side mimicking freestyle body roll', figure: TrunkRotationFigure },
-  ],
-  running: [
-    { number: '01', title: 'Arm Drive Reach', instruction: 'Drive both arms overhead in an exaggerated running arm swing', figure: OverheadReachFigure },
-    { number: '02', title: 'Single-Leg Squat', instruction: 'Balance on one leg, squat as low as comfortable, then switch', figure: DeepSquatFigure },
-    { number: '03', title: 'Hip Flexor Lunge', instruction: 'Step into the deepest lunge you can, feeling the hip flexor stretch', figure: ForwardLungeFigure },
-    { number: '04', title: 'Running Torso Rotation', instruction: 'Elbows bent at 90°, rotate your torso as in a sprint arm swing', figure: TrunkRotationFigure },
   ],
   crossfit: [
     { number: '01', title: 'Overhead Squat Reach', instruction: 'Extend arms fully overhead with thumbs back, as in an overhead squat', figure: OverheadReachFigure },
@@ -91,6 +79,7 @@ export default function MovementRecording() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [cvResult, setCvResult] = useState(null);
 
   function handleFileUpload(e) {
     const file = e.target.files?.[0];
@@ -115,11 +104,22 @@ export default function MovementRecording() {
     fetch(`${STREAM_URL}/${next ? 'pause' : 'resume'}`, { method: 'POST' }).catch(console.error);
   }
 
-  function handleStopStream() {
+  async function handleStopStream() {
     setIsStreaming(false);
     setIsPaused(false);
-    setVideoReady(false);
-    fetch(`${STREAM_URL}/stop`, { method: 'POST' }).catch(console.error);
+    try {
+      const res = await fetch(`${STREAM_URL}/stop`, { method: 'POST' });
+      const data = await res.json();
+      if (data.session) {
+        setCvResult(data.session);
+        setVideoReady(true);  // keep ready — recording is saved
+      } else {
+        setVideoReady(false);
+      }
+    } catch {
+      // CV server unreachable — reset so user can try again
+      setVideoReady(false);
+    }
   }
 
   function handleSwitchCamera() {
@@ -129,7 +129,22 @@ export default function MovementRecording() {
   async function handleAnalyze() {
     if (!videoReady) return;
     setIsAnalyzing(true);
-    await runAnalysis(selectedSport);
+
+    // If the live stream is still running, stop it now and capture the session JSON
+    let sessionData = cvResult;
+    if (isStreaming) {
+      setIsStreaming(false);
+      setIsPaused(false);
+      try {
+        const res = await fetch(`${STREAM_URL}/stop`, { method: 'POST' });
+        const data = await res.json();
+        if (data.session) sessionData = data.session;
+      } catch {
+        // CV server unreachable — fall through to demo data
+      }
+    }
+
+    await runAnalysis(selectedSport, sessionData);
     navigate('/analysis');
   }
 
@@ -184,8 +199,14 @@ export default function MovementRecording() {
                 </svg>
               </div>
               <div className="video-ready-text">
-                <span className="video-ready-title">{isStreaming ? 'Live analysis running' : 'Video received'}</span>
-                <span className="video-ready-sub">Ready to analyze your movement patterns</span>
+                <span className="video-ready-title">
+                  {isStreaming ? 'Live analysis running' : cvResult ? 'Recording saved' : 'Video received'}
+                </span>
+                <span className="video-ready-sub">
+                  {cvResult && !isStreaming
+                    ? `${cvResult.duration_sec}s recorded — click Analyze to continue`
+                    : 'Ready to analyze your movement patterns'}
+                </span>
               </div>
             </div>
           )}

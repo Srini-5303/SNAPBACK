@@ -245,10 +245,8 @@ const genericPlan = (sportName) => ({
 
 export const demoExercisePlan = {
   tennis:     plans.tennis,
-  soccer:     genericPlan('Soccer'),
   basketball: genericPlan('Basketball'),
   swimming:   genericPlan('Swimming'),
-  running:    genericPlan('Running'),
   crossfit:   genericPlan('CrossFit'),
   golf:       genericPlan('Golf'),
   volleyball: genericPlan('Volleyball'),

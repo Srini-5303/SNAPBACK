@@ -55,6 +55,56 @@
   margin-bottom: 40px;
 }
 
+/* ── Things to avoid ─────────────────────────────────────── */
+.avoid-section {
+  background: rgba(255, 71, 87, 0.05);
+  border: 1px solid rgba(255, 71, 87, 0.25);
+  border-left: 3px solid var(--color-red, #FF4757);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin-bottom: 40px;
+}
+
+.avoid-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-red, #FF4757);
+  font-family: var(--font-heading);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.avoid-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.avoid-item {
+  font-size: 0.83rem;
+  color: var(--color-text-muted);
+  padding-left: 16px;
+  position: relative;
+  line-height: 1.5;
+}
+
+.avoid-item::before {
+  content: '✕';
+  position: absolute;
+  left: 0;
+  color: var(--color-red, #FF4757);
+  font-size: 0.65rem;
+  top: 3px;
+  font-weight: 700;
+}
+
 /* ── Footer ───────────────────────────────────────────────── */
 .exercise-plan-footer {
   display: flex;

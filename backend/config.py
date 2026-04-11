@@ -3,116 +3,136 @@
 # Joint keys match the CV server output (cv/server.py):
 #   shoulder, elbow, hip, knee
 # Each joint has a required session ROM (degrees) for left, right, and combined.
+#
+# Clinical reference ROMs from Range of Joint Motion Evaluation Chart (PDF):
+#   Shoulder flexion: 150°  |  Elbow flexion: 150°
+#   Hip flexion: 100°       |  Knee flexion: 150°
+#
+# CV module reference ROMs (100% score threshold in cv/src/analysis/mobility.py):
+#   shoulder: 140°  |  elbow: 145°  |  hip: 110°  |  knee: 155°
+#
+# Sport required values = sport-demand % × CV reference ROM
+# (higher % = sport demands greater share of full clinical range)
 
 SPORT_BLUEPRINTS = {
     "tennis": {
+        # Shoulder: 90% (serving requires near-full overhead elevation)
+        # Elbow:    80% (groundstroke extension/flexion arc)
+        # Hip:      75% (lateral splits, serve rotation)
+        # Knee:     75% (split-step absorption, court coverage)
         "name": "Tennis",
         "tag": "Upper body dominant",
         "emoji": "🎾",
         "joints": {
-            "shoulder": {"label": "Shoulder ROM", "required_combined": 90, "required_left": 90, "required_right": 90},
-            "elbow":    {"label": "Elbow ROM",    "required_combined": 95, "required_left": 95, "required_right": 95},
-            "hip":      {"label": "Hip ROM",      "required_combined": 75, "required_left": 75, "required_right": 75},
-            "knee":     {"label": "Knee ROM",     "required_combined": 55, "required_left": 55, "required_right": 55},
-        },
-    },
-    "soccer": {
-        "name": "Soccer",
-        "tag": "Full body explosive",
-        "emoji": "⚽",
-        "joints": {
-            "shoulder": {"label": "Shoulder ROM", "required_combined": 55, "required_left": 55, "required_right": 55},
-            "elbow":    {"label": "Elbow ROM",    "required_combined": 70, "required_left": 70, "required_right": 70},
-            "hip":      {"label": "Hip ROM",      "required_combined": 95, "required_left": 95, "required_right": 95},
-            "knee":     {"label": "Knee ROM",     "required_combined": 75, "required_left": 75, "required_right": 75},
+            "shoulder": {"label": "Shoulder ROM", "required_combined": 125, "required_left": 125, "required_right": 125},
+            "elbow":    {"label": "Elbow ROM",    "required_combined": 115, "required_left": 115, "required_right": 115},
+            "hip":      {"label": "Hip ROM",      "required_combined": 82,  "required_left": 82,  "required_right": 82},
+            "knee":     {"label": "Knee ROM",     "required_combined": 115, "required_left": 115, "required_right": 115},
         },
     },
     "basketball": {
+        # Shoulder: 80% (shooting, rebounding reach)
+        # Elbow:    75% (shooting arc, dribbling)
+        # Hip:      80% (jump mechanics, defensive stance)
+        # Knee:     80% (deep knee bend in jumps/landing)
         "name": "Basketball",
         "tag": "Vertical & lateral power",
         "emoji": "🏀",
         "joints": {
-            "shoulder": {"label": "Shoulder ROM", "required_combined": 85, "required_left": 85, "required_right": 85},
-            "elbow":    {"label": "Elbow ROM",    "required_combined": 90, "required_left": 90, "required_right": 90},
-            "hip":      {"label": "Hip ROM",      "required_combined": 85, "required_left": 85, "required_right": 85},
-            "knee":     {"label": "Knee ROM",     "required_combined": 75, "required_left": 75, "required_right": 75},
+            "shoulder": {"label": "Shoulder ROM", "required_combined": 112, "required_left": 112, "required_right": 112},
+            "elbow":    {"label": "Elbow ROM",    "required_combined": 109, "required_left": 109, "required_right": 109},
+            "hip":      {"label": "Hip ROM",      "required_combined": 88,  "required_left": 88,  "required_right": 88},
+            "knee":     {"label": "Knee ROM",     "required_combined": 124, "required_left": 124, "required_right": 124},
         },
     },
     "swimming": {
+        # Shoulder: 95% (freestyle/butterfly demand near-full overhead arc)
+        # Elbow:    70% (pull-through; arm relatively straight in freestyle)
+        # Hip:      70% (flutter kick amplitude)
+        # Knee:     65% (breaststroke kick, limited knee range needed)
         "name": "Swimming",
         "tag": "Shoulder mobility critical",
         "emoji": "🏊",
         "joints": {
-            "shoulder": {"label": "Shoulder ROM", "required_combined": 115, "required_left": 115, "required_right": 115},
-            "elbow":    {"label": "Elbow ROM",    "required_combined": 80,  "required_left": 80,  "required_right": 80},
-            "hip":      {"label": "Hip ROM",      "required_combined": 75,  "required_left": 75,  "required_right": 75},
-            "knee":     {"label": "Knee ROM",     "required_combined": 55,  "required_left": 55,  "required_right": 55},
-        },
-    },
-    "running": {
-        "name": "Running",
-        "tag": "Lower body endurance",
-        "emoji": "🏃",
-        "joints": {
-            "shoulder": {"label": "Shoulder ROM", "required_combined": 55, "required_left": 55, "required_right": 55},
-            "elbow":    {"label": "Elbow ROM",    "required_combined": 75, "required_left": 75, "required_right": 75},
-            "hip":      {"label": "Hip ROM",      "required_combined": 90, "required_left": 90, "required_right": 90},
-            "knee":     {"label": "Knee ROM",     "required_combined": 65, "required_left": 65, "required_right": 65},
+            "shoulder": {"label": "Shoulder ROM", "required_combined": 133, "required_left": 133, "required_right": 133},
+            "elbow":    {"label": "Elbow ROM",    "required_combined": 101, "required_left": 101, "required_right": 101},
+            "hip":      {"label": "Hip ROM",      "required_combined": 77,  "required_left": 77,  "required_right": 77},
+            "knee":     {"label": "Knee ROM",     "required_combined": 101, "required_left": 101, "required_right": 101},
         },
     },
     "crossfit": {
+        # Shoulder: 95% (overhead squat, snatch demand maximum elevation)
+        # Elbow:    90% (full pressing & pulling range)
+        # Hip:      90% (deep squat below parallel)
+        # Knee:     88% (full depth squat mechanics)
         "name": "CrossFit",
         "tag": "Full body strength & power",
         "emoji": "🏋️",
         "joints": {
-            "shoulder": {"label": "Shoulder ROM", "required_combined": 100, "required_left": 100, "required_right": 100},
-            "elbow":    {"label": "Elbow ROM",    "required_combined": 105, "required_left": 105, "required_right": 105},
-            "hip":      {"label": "Hip ROM",      "required_combined": 95,  "required_left": 95,  "required_right": 95},
-            "knee":     {"label": "Knee ROM",     "required_combined": 85,  "required_left": 85,  "required_right": 85},
+            "shoulder": {"label": "Shoulder ROM", "required_combined": 133, "required_left": 133, "required_right": 133},
+            "elbow":    {"label": "Elbow ROM",    "required_combined": 130, "required_left": 130, "required_right": 130},
+            "hip":      {"label": "Hip ROM",      "required_combined": 99,  "required_left": 99,  "required_right": 99},
+            "knee":     {"label": "Knee ROM",     "required_combined": 136, "required_left": 136, "required_right": 136},
         },
     },
     "golf": {
+        # Shoulder: 85% (backswing elevation, follow-through)
+        # Elbow:    80% (lead arm extension in backswing)
+        # Hip:      85% (hip turn generates rotational power)
+        # Knee:     65% (subtle knee flex in address/pivot)
         "name": "Golf",
         "tag": "Rotational power",
         "emoji": "⛳",
         "joints": {
-            "shoulder": {"label": "Shoulder ROM", "required_combined": 80, "required_left": 80, "required_right": 80},
-            "elbow":    {"label": "Elbow ROM",    "required_combined": 85, "required_left": 85, "required_right": 85},
-            "hip":      {"label": "Hip ROM",      "required_combined": 90, "required_left": 90, "required_right": 90},
-            "knee":     {"label": "Knee ROM",     "required_combined": 55, "required_left": 55, "required_right": 55},
+            "shoulder": {"label": "Shoulder ROM", "required_combined": 119, "required_left": 119, "required_right": 119},
+            "elbow":    {"label": "Elbow ROM",    "required_combined": 116, "required_left": 116, "required_right": 116},
+            "hip":      {"label": "Hip ROM",      "required_combined": 93,  "required_left": 93,  "required_right": 93},
+            "knee":     {"label": "Knee ROM",     "required_combined": 101, "required_left": 101, "required_right": 101},
         },
     },
     "volleyball": {
+        # Shoulder: 95% (spike/serve require maximum overhead mobility)
+        # Elbow:    80% (arm swing mechanics, blocking)
+        # Hip:      80% (jump approach, landing depth)
+        # Knee:     80% (approach jump, landing absorption)
         "name": "Volleyball",
         "tag": "Explosive overhead",
         "emoji": "🏐",
         "joints": {
-            "shoulder": {"label": "Shoulder ROM", "required_combined": 95, "required_left": 95, "required_right": 95},
-            "elbow":    {"label": "Elbow ROM",    "required_combined": 80, "required_left": 80, "required_right": 80},
-            "hip":      {"label": "Hip ROM",      "required_combined": 75, "required_left": 75, "required_right": 75},
-            "knee":     {"label": "Knee ROM",     "required_combined": 65, "required_left": 65, "required_right": 65},
+            "shoulder": {"label": "Shoulder ROM", "required_combined": 133, "required_left": 133, "required_right": 133},
+            "elbow":    {"label": "Elbow ROM",    "required_combined": 116, "required_left": 116, "required_right": 116},
+            "hip":      {"label": "Hip ROM",      "required_combined": 88,  "required_left": 88,  "required_right": 88},
+            "knee":     {"label": "Knee ROM",     "required_combined": 124, "required_left": 124, "required_right": 124},
         },
     },
     "baseball": {
+        # Shoulder: 95% (overhead throw demands maximum shoulder mobility)
+        # Elbow:    90% (deceleration phase, UCL load at full flexion)
+        # Hip:      85% (hip-shoulder separation drives rotational power)
+        # Knee:     70% (fielding crouch, running base paths)
         "name": "Baseball",
         "tag": "Rotational & throwing",
         "emoji": "⚾",
         "joints": {
-            "shoulder": {"label": "Shoulder ROM", "required_combined": 110, "required_left": 110, "required_right": 110},
-            "elbow":    {"label": "Elbow ROM",    "required_combined": 95,  "required_left": 95,  "required_right": 95},
-            "hip":      {"label": "Hip ROM",      "required_combined": 85,  "required_left": 85,  "required_right": 85},
-            "knee":     {"label": "Knee ROM",     "required_combined": 65,  "required_left": 65,  "required_right": 65},
+            "shoulder": {"label": "Shoulder ROM", "required_combined": 133, "required_left": 133, "required_right": 133},
+            "elbow":    {"label": "Elbow ROM",    "required_combined": 130, "required_left": 130, "required_right": 130},
+            "hip":      {"label": "Hip ROM",      "required_combined": 93,  "required_left": 93,  "required_right": 93},
+            "knee":     {"label": "Knee ROM",     "required_combined": 109, "required_left": 109, "required_right": 109},
         },
     },
     "boxing": {
+        # Shoulder: 85% (jab extension, uppercut follow-through)
+        # Elbow:    90% (full extension on cross/jab, guard flexion)
+        # Hip:      80% (hip rotation drives punch power)
+        # Knee:     70% (stance flex, slip & roll movements)
         "name": "Boxing",
         "tag": "Full body rotational",
         "emoji": "🥊",
         "joints": {
-            "shoulder": {"label": "Shoulder ROM", "required_combined": 80, "required_left": 80, "required_right": 80},
-            "elbow":    {"label": "Elbow ROM",    "required_combined": 95, "required_left": 95, "required_right": 95},
-            "hip":      {"label": "Hip ROM",      "required_combined": 80, "required_left": 80, "required_right": 80},
-            "knee":     {"label": "Knee ROM",     "required_combined": 65, "required_left": 65, "required_right": 65},
+            "shoulder": {"label": "Shoulder ROM", "required_combined": 119, "required_left": 119, "required_right": 119},
+            "elbow":    {"label": "Elbow ROM",    "required_combined": 130, "required_left": 130, "required_right": 130},
+            "hip":      {"label": "Hip ROM",      "required_combined": 88,  "required_left": 88,  "required_right": 88},
+            "knee":     {"label": "Knee ROM",     "required_combined": 109, "required_left": 109, "required_right": 109},
         },
     },
 }

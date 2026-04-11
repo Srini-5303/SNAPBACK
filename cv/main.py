@@ -31,7 +31,7 @@ MAX_CAM_PROBE  = 6   # how many camera indices to probe at startup
 
 # Set to a file path to use a video instead of a live camera.
 # Set to None to use the live camera.
-VIDEO_PATH = r"C:\Users\aareg\Downloads\WhatsApp Video 2026-04-11 at 12.02.30 PM.mp4"
+VIDEO_PATH = None  # set to a file path to use a video instead of live camera
 
 
 # ---------------------------------------------------------------------------

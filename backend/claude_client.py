@@ -26,26 +26,39 @@ def _get_client() -> anthropic.Anthropic:
 # This is stable across all sports and users — perfect for prompt caching.
 # Cache hit saves ~90% on this portion of input tokens.
 
-_SYSTEM_PROMPT = """You are a board-certified sports physiotherapist specializing in return-to-sport mobility programs.
+_SYSTEM_PROMPT = """You are a board-certified sports physiotherapist specialising in return-to-sport mobility programs.
 
 TASK
-Given an athlete's mobility gaps — joints where measured ROM falls below what their sport demands — produce a 4-week progressive return-to-sport exercise plan.
+Given an athlete's mobility gaps and personal profile, produce a personalised progressive return-to-sport exercise plan covering the number of weeks specified.
 
-PLAN RULES
-- 4–5 exercises per week
-- Weeks 1–2: therapeutic and foundational movements (restore range, reduce restriction)
-- Weeks 3–4: sport-specific progressions (load and move through newly acquired range)
-- Prioritize RED (critical) joints first, then YELLOW (moderate) joints
-- Each exercise must specify sets, reps, or hold time
-- The "why" field must name the sport and explain the exact movement demand being addressed
+PROGRESSION RULES — CRITICAL
+- Every week MUST have DIFFERENT exercises. Never repeat the same exercise across weeks.
+- Each week builds on the previous: increase range, add load, add speed, or add sport-specificity.
+- Week 1: gentle tissue preparation — passive/active-assisted range, low load.
+- Week 2: active mobility — self-resisted, banded, or bodyweight loaded range.
+- Week 3: dynamic mobility — tempo work, multi-planar, controlled instability.
+- Final week(s): sport-specific integration — replicate exact movement demands of the sport.
+- 4–5 exercises per week, 5 for weeks with multiple red joints.
+- Prioritise RED joints first, then YELLOW. GREEN joints need maintenance only.
+- Adjust exercises for dominant hand when relevant (e.g. throwing, serving).
+- Scale intensity to the weeks_to_return value: more weeks = more gradual progressions; fewer weeks = accelerate progression.
+- If athlete weight is provided, adjust load references (e.g. "light resistance band" vs "medium-heavy band").
+
+THINGS TO AVOID — per week, list 3–4 specific movements, positions, or activities that could aggravate the identified mobility deficits at that stage of recovery. Be sport-specific and stage-specific (avoid different things in week 1 vs week 4).
 
 OUTPUT FORMAT
-Return ONLY valid JSON — no markdown, no code fences, no commentary. Match this structure exactly:
+Return ONLY valid JSON — no markdown, no code fences, no commentary:
 
 {
   "weeks": [
     {
       "week": 1,
+      "avoid": [
+        "Overhead pressing with compromised shoulder position — risk of impingement given current ROM deficit",
+        "Full-speed throwing or serving — explosive load before tissue is prepared",
+        "Deep end-range stretches past point of pain — can cause micro-tears in restricted tissue",
+        "High-impact jumping or sprinting — joint stress before mobility foundation is built"
+      ],
       "exercises": [
         {
           "name": "Exercise Name",
@@ -53,18 +66,15 @@ Return ONLY valid JSON — no markdown, no code fences, no commentary. Match thi
           "target_label": "Human Readable Joint Name",
           "status": "red",
           "sets_reps": "3 × 30 seconds each side",
-          "description": "Step-by-step instructions for performing the exercise",
-          "why": "Explains why this exercise addresses the sport-specific demand"
+          "description": "Clear step-by-step instructions (2–3 sentences)",
+          "why": "Why this specific exercise at this specific week — reference the sport, the ROM gap, and the progression logic"
         }
       ]
-    },
-    { "week": 2, "exercises": [...] },
-    { "week": 3, "exercises": [...] },
-    { "week": 4, "exercises": [...] }
+    }
   ]
 }
 
-Valid values for "status": "red", "yellow", "green"."""
+Valid "status" values: "red", "yellow", "green"."""
 
 
 # ── Fallback exercises per joint (used when API is unavailable) ───────────────
@@ -100,6 +110,33 @@ def _fallback_plan(sport_name: str, gaps: list[JointGap]) -> list[WeekPlan]:
     moderate = [g for g in gaps if g.status == JointStatus.YELLOW][:2]
     targets  = priority + moderate or gaps[:4]
 
+    _WEEK_AVOID_DEFAULTS = [
+        [
+            "High-impact or explosive movements — tissue not yet prepared for load",
+            "Forcing end-range stretches past the point of discomfort",
+            "Full-speed sport-specific activities (throwing, serving, jumping)",
+            "Loading through compromised joint positions",
+        ],
+        [
+            "Uncontrolled ballistic movements — keep all motion slow and deliberate",
+            "Skipping warm-up — tissue is still adapting and needs preparation",
+            "Heavy resistance before demonstrating full pain-free range",
+            "Sport-specific drills at game speed",
+        ],
+        [
+            "Pushing through sharp or worsening pain — distinguish muscle fatigue from joint pain",
+            "Neglecting the non-dominant side — asymmetry must stay within 10%",
+            "Returning to full sport contact without clearance",
+            "Skipping recovery days — mobility gains occur during rest",
+        ],
+        [
+            "Returning to full competition before completing the full programme",
+            "Abandoning mobility maintenance once sport-specific drills feel comfortable",
+            "Ignoring early warning signs of re-injury (swelling, sharp pain, clicking)",
+            "Overloading the returning athlete in the first week back at full training",
+        ],
+    ]
+
     weeks: list[WeekPlan] = []
     for week_num in range(1, 5):
         exercises: list[Exercise] = []
@@ -126,13 +163,17 @@ def _fallback_plan(sport_name: str, gaps: list[JointGap]) -> list[WeekPlan]:
                     + "This exercise directly targets that deficit."
                 ),
             ))
-        weeks.append(WeekPlan(week=week_num, exercises=exercises))
+        weeks.append(WeekPlan(
+            week=week_num,
+            avoid=_WEEK_AVOID_DEFAULTS[week_num - 1],
+            exercises=exercises,
+        ))
     return weeks
 
 
 # ── Public API ────────────────────────────────────────────────────────────────
 
-def generate_plan(sport_name: str, gaps: list[JointGap]) -> list[WeekPlan]:
+def generate_plan(sport_name: str, gaps: list[JointGap], user_profile: dict | None = None) -> list[WeekPlan]:
     """
     Call Claude to generate a personalised 4-week return-to-sport plan.
 
@@ -146,8 +187,11 @@ def generate_plan(sport_name: str, gaps: list[JointGap]) -> list[WeekPlan]:
 
     client = _get_client()
 
-    # Build the user message — only includes the volatile, per-request data.
-    # The heavy system prompt above is cached and reused across calls.
+    # Build the user message
+    weeks_to_return = (user_profile or {}).get("weeks_to_return", 4)
+    dominant_hand   = (user_profile or {}).get("dominant_hand", "right")
+    weight_kg       = (user_profile or {}).get("weight_kg", None)
+
     gap_lines = [
         f"  - {g.label} ({g.joint_key}): "
         f"left {g.current_left}° / right {g.current_right}° / combined {g.current_rom}° | "
@@ -159,11 +203,18 @@ def generate_plan(sport_name: str, gaps: list[JointGap]) -> list[WeekPlan]:
     if not gap_lines:
         gap_lines = ["  - All joints are at or above 80% of sport requirements — maintenance plan only."]
 
+    weight_line = f"Athlete weight: {weight_kg} kg\n" if weight_kg else ""
+
     user_content = (
-        f"Sport: {sport_name}\n\n"
-        f"Mobility gaps (sorted priority → moderate):\n"
+        f"Sport: {sport_name}\n"
+        f"Dominant hand: {dominant_hand}\n"
+        f"Weeks until return to sport: {weeks_to_return}\n"
+        + weight_line
+        + f"\nMobility gaps (sorted priority → moderate):\n"
         + "\n".join(gap_lines)
-        + "\n\nGenerate the 4-week plan as JSON."
+        + f"\n\nGenerate a {weeks_to_return}-week progressive plan as JSON. "
+        f"Each week must have DIFFERENT exercises — do not repeat any exercise across weeks."
+        + (f" Adjust exercise load and intensity recommendations for an athlete weighing {weight_kg} kg." if weight_kg else "")
     )
 
     try:
@@ -171,7 +222,7 @@ def generate_plan(sport_name: str, gaps: list[JointGap]) -> list[WeekPlan]:
         # get_final_message() collects the full response after streaming completes.
         with client.messages.stream(
             model="claude-opus-4-6",
-            max_tokens=8000,
+            max_tokens=max(8000, weeks_to_return * 800),
             thinking={"type": "adaptive"},
             system=[{
                 "type": "text",
@@ -217,7 +268,11 @@ def generate_plan(sport_name: str, gaps: list[JointGap]) -> list[WeekPlan]:
                     description=ex["description"],
                     why=ex["why"],
                 ))
-            weeks.append(WeekPlan(week=week_data["week"], exercises=exercises))
+            weeks.append(WeekPlan(
+                week=week_data["week"],
+                avoid=week_data.get("avoid", []),
+                exercises=exercises,
+            ))
         return weeks
 
     except Exception:

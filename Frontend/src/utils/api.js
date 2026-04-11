@@ -19,19 +19,29 @@ const STATUS_TO_SEVERITY = { red: 'priority', yellow: 'moderate', green: 'good' 
  * Transform backend /api/analyze gaps array → frontend joints array
  * (shape expected by computeGapAnalysis consumers: HologramBodyMap, AnalysisPanel)
  */
+function sideSeverity(romDeg, required) {
+  if (!required || required === 0) return 'good';
+  const pct = romDeg / required;
+  if (pct >= 0.80) return 'good';
+  if (pct >= 0.60) return 'moderate';
+  return 'priority';
+}
+
 function transformGapAnalysis(data) {
   const joints = data.gaps.map((g) => ({
-    key:          g.joint_key,
-    label:        g.label,
-    current:      g.current_rom,
-    currentLeft:  g.current_left,
-    currentRight: g.current_right,
-    required:     g.required_rom,
-    gap:          g.gap,
-    gapPercent:   g.required_rom > 0 ? g.gap / g.required_rom : 0,
-    asymmetry:    g.asymmetry,
-    severity:     STATUS_TO_SEVERITY[g.status] ?? 'good',
-    score:        g.percent_achieved,
+    key:           g.joint_key,
+    label:         g.label,
+    current:       g.current_rom,
+    currentLeft:   g.current_left,
+    currentRight:  g.current_right,
+    required:      g.required_rom,
+    gap:           g.gap,
+    gapPercent:    g.required_rom > 0 ? g.gap / g.required_rom : 0,
+    asymmetry:     g.asymmetry,
+    severity:      STATUS_TO_SEVERITY[g.status] ?? 'good',
+    severityLeft:  sideSeverity(g.current_left,  g.required_rom),
+    severityRight: sideSeverity(g.current_right, g.required_rom),
+    score:         g.percent_achieved,
   }));
 
   return {
@@ -50,7 +60,8 @@ function transformPlan(data) {
   return {
     weeks: data.plan.map((w) => ({
       weekNumber: w.week,
-      focus:      `Week ${w.week} — targeted mobility progression`,
+      focus:      w.focus ?? `Week ${w.week}`,
+      avoid:      w.avoid ?? [],
       exercises:  w.exercises.map((ex) => ({
         name:        ex.name,
         targetJoint: ex.target_label,
@@ -94,8 +105,11 @@ export async function fetchSportPreview(sport) {
  *
  * Returns { gapAnalysis, exercisePlan } in the frontend's expected shape.
  */
+/**
+ * Run gap analysis only (no plan). Called when the user finishes recording.
+ */
 export async function analyzeMovement(sport, cvResult = null) {
-  const body = { sport, use_demo: !cvResult };
+  const body = { sport, use_demo: !cvResult, skip_plan: true };
   if (cvResult) body.cv_result = cvResult;
 
   const res = await fetch(`${BASE_URL}/api/analyze`, {
@@ -106,8 +120,32 @@ export async function analyzeMovement(sport, cvResult = null) {
   if (!res.ok) throw new Error(`Analysis failed: ${res.status}`);
   const data = await res.json();
 
-  return {
-    gapAnalysis:  transformGapAnalysis(data),
-    exercisePlan: transformPlan(data),
-  };
+  return { gapAnalysis: transformGapAnalysis(data) };
+}
+
+/**
+ * Generate the personalised plan. Called after the user answers the profile
+ * questions (dominant hand + weeks to return).
+ */
+export async function generatePlanRequest(sport, cvResult = null, userProfile = null) {
+  const body = { sport, use_demo: !cvResult };
+  if (cvResult) body.cv_result = cvResult;
+  if (userProfile) {
+    // Convert camelCase frontend keys → snake_case backend Pydantic model
+    body.user_profile = {
+      dominant_hand:   userProfile.dominantHand,
+      weeks_to_return: userProfile.weeksToReturn,
+      weight_kg:       userProfile.weightKg ?? null,
+    };
+  }
+
+  const res = await fetch(`${BASE_URL}/api/plan`, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`Plan generation failed: ${res.status}`);
+  const data = await res.json();
+
+  return { exercisePlan: transformPlan(data) };
 }

@@ -37,7 +37,8 @@ from src.ui.overlay import OverlayRenderer, PANEL_WIDTH
 
 RESULTS_DIR = Path(__file__).parent / "results"
 
-VIDEO_PATH = r"C:\Users\aareg\Downloads\WhatsApp Video 2026-04-11 at 12.02.30 PM.mp4"
+VIDEO_PATH  = None  # set to a file path to use a video instead of live camera
+PHONE_URL   = None  # e.g. "http://192.168.1.42:8080/video" for IP Webcam app
 MAX_CAM_PROBE = 4
 
 app = Flask(__name__)
@@ -71,7 +72,8 @@ _pipeline_thread: threading.Thread | None = None
 # ---------------------------------------------------------------------------
 
 def _probe_sources() -> list:
-    """Return [1, 0, …, "video"] — cam 1 first, cam 0 second, video last."""
+    """Return ordered list of available sources.
+    Priority: phone URL > cam 1 > cam 0 > … > video file."""
     available: set[int] = set()
     for i in range(MAX_CAM_PROBE):
         cap = cv2.VideoCapture(i)
@@ -83,6 +85,8 @@ def _probe_sources() -> list:
     ordered += sorted(i for i in available if i not in [1, 0])
     if VIDEO_PATH:
         ordered.append("video")
+    if PHONE_URL:
+        ordered.insert(0, "phone")   # phone takes priority when configured
     return ordered
 
 
@@ -90,6 +94,9 @@ def _open_source(src) -> tuple[cv2.VideoCapture, bool, str]:
     """Open a source, return (cap, is_video_mode, label)."""
     if src == "video":
         return cv2.VideoCapture(VIDEO_PATH), True, "Video"
+    if src == "phone":
+        cap = cv2.VideoCapture(PHONE_URL)
+        return cap, False, f"Phone ({PHONE_URL})"
     cap = cv2.VideoCapture(src)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH,  1280)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
@@ -295,6 +302,27 @@ def switch():
         _switch_requested = True
     print(f"[server] switching to source index {_source_pos}")
     return jsonify({'status': 'switching'})
+
+
+@app.route('/set-source', methods=['POST'])
+def set_source():
+    """Set a custom URL source (e.g. phone IP Webcam stream).
+
+    Body: { "url": "http://192.168.1.42:8080/video" }
+    Clears the URL if body is {} or {"url": null}.
+    """
+    from flask import request as req
+    global PHONE_URL, _source_pos, _switch_requested, _sources
+    data = req.get_json(silent=True) or {}
+    PHONE_URL = data.get('url') or None
+    # Rebuild source list so new source takes effect on next /start or switch
+    with _source_lock:
+        _sources = _probe_sources()
+        _source_pos = 0
+        _switch_requested = True
+    label = PHONE_URL or "cleared"
+    print(f"[server] phone URL set to: {label}")
+    return jsonify({'status': 'ok', 'phone_url': PHONE_URL, 'sources': _sources})
 
 
 @app.route('/status')

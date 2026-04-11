@@ -21,7 +21,7 @@ export default function ExercisePlan() {
       <div className="page-container">
 
         <div className="exercise-plan-header">
-          <h1>Your 4-Week Return to {sportName} Plan</h1>
+          <h1>Your {weeks.length}-Week Return to {sportName} Plan</h1>
           <p>Targeting your specific mobility gaps · 15–20 minutes per day</p>
         </div>
 
@@ -40,6 +40,23 @@ export default function ExercisePlan() {
           ))}
         </div>
 
+        {currentWeek.avoid && currentWeek.avoid.length > 0 && (
+          <div className="avoid-section">
+            <div className="avoid-header">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+              <span>Things to Avoid — Week {activeWeek}</span>
+            </div>
+            <ul className="avoid-list">
+              {currentWeek.avoid.map((item, i) => (
+                <li key={i} className="avoid-item">{item}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <div className="exercise-plan-footer">
           <div className="exercise-plan-actions">
             <button className="btn-pdf" disabled>
@@ -56,7 +73,7 @@ export default function ExercisePlan() {
             </button>
           </div>
           <p className="exercise-disclaimer">
-            ReMotion is a mobility training tool, not medical advice. Consult a healthcare professional for injuries or pain.
+            SNAPBACK is a mobility training tool, not medical advice. Consult a healthcare professional for injuries or pain.
           </p>
         </div>
 
