@@ -21,18 +21,22 @@ const STATUS_TO_SEVERITY = { red: 'priority', yellow: 'moderate', green: 'good' 
  */
 function transformGapAnalysis(data) {
   const joints = data.gaps.map((g) => ({
-    key:        g.joint_key,
-    label:      g.label,
-    current:    g.current_rom,
-    required:   g.required_rom,
-    gap:        g.gap,
-    gapPercent: g.required_rom > 0 ? g.gap / g.required_rom : 0,
-    severity:   STATUS_TO_SEVERITY[g.status] ?? 'good',
-    score:      g.percent_achieved,
+    key:          g.joint_key,
+    label:        g.label,
+    current:      g.current_rom,
+    currentLeft:  g.current_left,
+    currentRight: g.current_right,
+    required:     g.required_rom,
+    gap:          g.gap,
+    gapPercent:   g.required_rom > 0 ? g.gap / g.required_rom : 0,
+    asymmetry:    g.asymmetry,
+    severity:     STATUS_TO_SEVERITY[g.status] ?? 'good',
+    score:        g.percent_achieved,
   }));
 
   return {
     sportName:      data.sport_name,
+    overallScore:   data.overall_score,
     readinessScore: data.readiness_score,
     joints,
   };
@@ -83,11 +87,21 @@ export async function fetchSportPreview(sport) {
  *
  * Returns { gapAnalysis, exercisePlan } in the frontend's expected shape.
  */
-export async function analyzeMovement(sport) {
+/**
+ * Run full mobility analysis pipeline.
+ * Pass cvResult (from CV server JSON) to use real recorded data.
+ * Omit cvResult to use demo data.
+ *
+ * Returns { gapAnalysis, exercisePlan } in the frontend's expected shape.
+ */
+export async function analyzeMovement(sport, cvResult = null) {
+  const body = { sport, use_demo: !cvResult };
+  if (cvResult) body.cv_result = cvResult;
+
   const res = await fetch(`${BASE_URL}/api/analyze`, {
     method:  'POST',
     headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify({ sport, use_demo: true }),
+    body:    JSON.stringify(body),
   });
   if (!res.ok) throw new Error(`Analysis failed: ${res.status}`);
   const data = await res.json();

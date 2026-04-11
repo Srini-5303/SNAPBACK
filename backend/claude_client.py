@@ -69,21 +69,28 @@ Valid values for "status": "red", "yellow", "green"."""
 
 # ── Fallback exercises per joint (used when API is unavailable) ───────────────
 
+# Keyed by the 4 joints the CV server tracks: shoulder, elbow, hip, knee
 _JOINT_FALLBACKS: dict[str, tuple[str, str, str]] = {
-    "hip_flexion":           ("90/90 Hip Flexor Stretch",        "Kneel in a lunge. Tuck pelvis and drive hips forward until a stretch is felt in the front hip.",                              "3 × 60 seconds each side"),
-    "hip_extension":         ("Couch Stretch",                   "Kneel with rear foot against a wall. Drive hips forward while keeping torso upright.",                                        "3 × 60 seconds each side"),
-    "hip_internal_rotation": ("Seated Hip IR Drill",             "Sit with feet wider than hips. Let both knees drop inward simultaneously, hold at end range.",                               "3 × 30 seconds"),
-    "hip_external_rotation": ("Pigeon Pose Hold",                "From plank, bring one shin forward perpendicular to your body. Lower hips toward the floor and hold.",                       "3 × 60 seconds each side"),
-    "knee_flexion":          ("Heel Slide",                      "Lie on your back. Slowly slide the heel toward the glutes as far as comfortable. Hold 3 seconds at end range.",              "3 × 15 reps"),
-    "ankle_dorsiflexion":    ("Wall Ankle Mobilisation",         "Stand facing a wall. Place front foot 5 cm from the wall. Drive knee toward and past the wall without lifting the heel.",    "3 × 15 reps each side"),
-    "ankle_plantarflexion":  ("Seated Calf Raise with Stretch",  "Sit on the edge of a chair. Raise heels to full plantarflexion, pause, then lower slowly.",                                  "3 × 15 reps"),
-    "shoulder_flexion":      ("Wall Walk",                       "Stand facing a wall. Walk fingers up the wall reaching as high as possible while keeping the shoulder blade down.",          "3 × 10 reps"),
-    "shoulder_extension":    ("Doorway Shoulder Extension",      "Stand in a doorway. Grip the frame at hip height and lean forward, feeling a stretch across the front shoulder.",           "3 × 30 seconds each side"),
-    "shoulder_external_rotation": ("Side-Lying External Rotation", "Lie on side, elbow at 90°. Slowly rotate forearm up toward the ceiling. Lower with control.",                            "3 × 15 reps"),
-    "shoulder_internal_rotation": ("Sleeper Stretch",            "Lie on your side. Use your top arm to gently press the bottom forearm toward the floor.",                                   "3 × 30 seconds each side"),
-    "thoracic_rotation":     ("Seated Thoracic Rotation",        "Sit cross-legged, hands behind head. Rotate torso fully to each side, keeping hips still.",                                 "3 × 10 reps each side"),
-    "thoracic_extension":    ("Foam Roller Thoracic Extension",  "Place a foam roller perpendicular to the spine at mid-back. Extend over it, moving segment by segment.",                   "3 × 8 reps"),
-    "wrist_extension":       ("Wrist Extension Stretch",         "Arm straight in front, palm down. Use the other hand to gently pull fingers back toward the forearm.",                     "3 × 30 seconds each side"),
+    "shoulder": (
+        "Side-Lying Shoulder Circle",
+        "Lie on your side with knees bent. Draw slow large circles with your top arm, moving through the full pain-free range in both directions.",
+        "3 × 10 reps each direction",
+    ),
+    "elbow": (
+        "Active Elbow Flexion–Extension",
+        "Stand with arms at your sides. Slowly curl both forearms to full flexion, pause, then extend fully. Focus on end-range hold.",
+        "3 × 15 reps",
+    ),
+    "hip": (
+        "90/90 Hip Mobility Drill",
+        "Sit on the floor with both knees at 90°. Rotate your torso over the front knee, hold, then switch sides. Keep the spine tall throughout.",
+        "3 × 60 seconds each side",
+    ),
+    "knee": (
+        "Heel Slide",
+        "Lie on your back on a smooth surface. Slowly slide the heel toward the glutes as far as comfortable. Hold 3 seconds at end range, then slide back.",
+        "3 × 15 reps each leg",
+    ),
 }
 
 
@@ -113,8 +120,10 @@ def _fallback_plan(sport_name: str, gaps: list[JointGap]) -> list[WeekPlan]:
                 sets_reps=fallback[2],
                 description=fallback[1],
                 why=(
-                    f"Your {g.label.lower()} is {g.gap:.0f}° below what {sport_name} requires. "
-                    f"This exercise directly targets that deficit."
+                    f"Your {g.label.lower()} combined ROM is {g.current_rom:.0f}°, "
+                    f"{g.gap:.0f}° below the {g.required_rom:.0f}° required for {sport_name}. "
+                    + (f"A {g.asymmetry:.0f}° left–right asymmetry was also detected. " if g.asymmetry > 5 else "")
+                    + "This exercise directly targets that deficit."
                 ),
             ))
         weeks.append(WeekPlan(week=week_num, exercises=exercises))
@@ -141,8 +150,9 @@ def generate_plan(sport_name: str, gaps: list[JointGap]) -> list[WeekPlan]:
     # The heavy system prompt above is cached and reused across calls.
     gap_lines = [
         f"  - {g.label} ({g.joint_key}): "
-        f"current {g.current_rom}° | required {g.required_rom}° | "
-        f"gap {g.gap}° | {g.status.value.upper()}"
+        f"left {g.current_left}° / right {g.current_right}° / combined {g.current_rom}° | "
+        f"required {g.required_rom}° | gap {g.gap}° | "
+        f"asymmetry {g.asymmetry}° | {g.status.value.upper()}"
         for g in gaps
         if g.status in (JointStatus.RED, JointStatus.YELLOW)
     ]
@@ -161,12 +171,12 @@ def generate_plan(sport_name: str, gaps: list[JointGap]) -> list[WeekPlan]:
         # get_final_message() collects the full response after streaming completes.
         with client.messages.stream(
             model="claude-opus-4-6",
-            max_tokens=4096,
-            thinking={"type": "adaptive"},          # let the model decide reasoning depth
+            max_tokens=8000,
+            thinking={"type": "adaptive"},
             system=[{
                 "type": "text",
                 "text": _SYSTEM_PROMPT,
-                "cache_control": {"type": "ephemeral"},  # cache the stable system prompt
+                "cache_control": {"type": "ephemeral"},
             }],
             messages=[{"role": "user", "content": user_content}],
         ) as stream:

@@ -1,4 +1,8 @@
-# All constants: sport blueprints, demo mobility data, scoring thresholds
+# All constants: sport blueprints, demo CV result, scoring thresholds
+#
+# Joint keys match the CV server output (cv/server.py):
+#   shoulder, elbow, hip, knee
+# Each joint has a required session ROM (degrees) for left, right, and combined.
 
 SPORT_BLUEPRINTS = {
     "tennis": {
@@ -6,14 +10,10 @@ SPORT_BLUEPRINTS = {
         "tag": "Upper body dominant",
         "emoji": "🎾",
         "joints": {
-            "shoulder_external_rotation": {"required": 90,  "label": "Shoulder External Rotation"},
-            "shoulder_flexion":           {"required": 170, "label": "Shoulder Flexion"},
-            "thoracic_rotation":          {"required": 45,  "label": "Thoracic Rotation"},
-            "hip_flexion":                {"required": 120, "label": "Hip Flexion"},
-            "hip_internal_rotation":      {"required": 35,  "label": "Hip Internal Rotation"},
-            "knee_flexion":               {"required": 130, "label": "Knee Flexion"},
-            "ankle_dorsiflexion":         {"required": 20,  "label": "Ankle Dorsiflexion"},
-            "wrist_extension":            {"required": 70,  "label": "Wrist Extension"},
+            "shoulder": {"label": "Shoulder ROM", "required_combined": 90, "required_left": 90, "required_right": 90},
+            "elbow":    {"label": "Elbow ROM",    "required_combined": 95, "required_left": 95, "required_right": 95},
+            "hip":      {"label": "Hip ROM",      "required_combined": 75, "required_left": 75, "required_right": 75},
+            "knee":     {"label": "Knee ROM",     "required_combined": 55, "required_left": 55, "required_right": 55},
         },
     },
     "soccer": {
@@ -21,14 +21,10 @@ SPORT_BLUEPRINTS = {
         "tag": "Full body explosive",
         "emoji": "⚽",
         "joints": {
-            "hip_flexion":           {"required": 130, "label": "Hip Flexion"},
-            "hip_extension":         {"required": 30,  "label": "Hip Extension"},
-            "hip_internal_rotation": {"required": 40,  "label": "Hip Internal Rotation"},
-            "hip_external_rotation": {"required": 45,  "label": "Hip External Rotation"},
-            "knee_flexion":          {"required": 140, "label": "Knee Flexion"},
-            "ankle_dorsiflexion":    {"required": 25,  "label": "Ankle Dorsiflexion"},
-            "ankle_plantarflexion":  {"required": 50,  "label": "Ankle Plantarflexion"},
-            "thoracic_rotation":     {"required": 40,  "label": "Thoracic Rotation"},
+            "shoulder": {"label": "Shoulder ROM", "required_combined": 55, "required_left": 55, "required_right": 55},
+            "elbow":    {"label": "Elbow ROM",    "required_combined": 70, "required_left": 70, "required_right": 70},
+            "hip":      {"label": "Hip ROM",      "required_combined": 95, "required_left": 95, "required_right": 95},
+            "knee":     {"label": "Knee ROM",     "required_combined": 75, "required_left": 75, "required_right": 75},
         },
     },
     "basketball": {
@@ -36,14 +32,10 @@ SPORT_BLUEPRINTS = {
         "tag": "Vertical & lateral power",
         "emoji": "🏀",
         "joints": {
-            "shoulder_flexion":           {"required": 170, "label": "Shoulder Flexion"},
-            "shoulder_external_rotation": {"required": 80,  "label": "Shoulder External Rotation"},
-            "hip_flexion":                {"required": 125, "label": "Hip Flexion"},
-            "hip_extension":              {"required": 25,  "label": "Hip Extension"},
-            "knee_flexion":               {"required": 135, "label": "Knee Flexion"},
-            "ankle_dorsiflexion":         {"required": 25,  "label": "Ankle Dorsiflexion"},
-            "thoracic_rotation":          {"required": 40,  "label": "Thoracic Rotation"},
-            "wrist_extension":            {"required": 65,  "label": "Wrist Extension"},
+            "shoulder": {"label": "Shoulder ROM", "required_combined": 85, "required_left": 85, "required_right": 85},
+            "elbow":    {"label": "Elbow ROM",    "required_combined": 90, "required_left": 90, "required_right": 90},
+            "hip":      {"label": "Hip ROM",      "required_combined": 85, "required_left": 85, "required_right": 85},
+            "knee":     {"label": "Knee ROM",     "required_combined": 75, "required_left": 75, "required_right": 75},
         },
     },
     "swimming": {
@@ -51,14 +43,10 @@ SPORT_BLUEPRINTS = {
         "tag": "Shoulder mobility critical",
         "emoji": "🏊",
         "joints": {
-            "shoulder_flexion":           {"required": 180, "label": "Shoulder Flexion"},
-            "shoulder_extension":         {"required": 60,  "label": "Shoulder Extension"},
-            "shoulder_external_rotation": {"required": 95,  "label": "Shoulder External Rotation"},
-            "shoulder_internal_rotation": {"required": 70,  "label": "Shoulder Internal Rotation"},
-            "thoracic_extension":         {"required": 25,  "label": "Thoracic Extension"},
-            "hip_flexion":                {"required": 120, "label": "Hip Flexion"},
-            "ankle_plantarflexion":       {"required": 55,  "label": "Ankle Plantarflexion"},
-            "ankle_dorsiflexion":         {"required": 15,  "label": "Ankle Dorsiflexion"},
+            "shoulder": {"label": "Shoulder ROM", "required_combined": 115, "required_left": 115, "required_right": 115},
+            "elbow":    {"label": "Elbow ROM",    "required_combined": 80,  "required_left": 80,  "required_right": 80},
+            "hip":      {"label": "Hip ROM",      "required_combined": 75,  "required_left": 75,  "required_right": 75},
+            "knee":     {"label": "Knee ROM",     "required_combined": 55,  "required_left": 55,  "required_right": 55},
         },
     },
     "running": {
@@ -66,14 +54,10 @@ SPORT_BLUEPRINTS = {
         "tag": "Lower body endurance",
         "emoji": "🏃",
         "joints": {
-            "hip_flexion":           {"required": 120, "label": "Hip Flexion"},
-            "hip_extension":         {"required": 20,  "label": "Hip Extension"},
-            "knee_flexion":          {"required": 130, "label": "Knee Flexion"},
-            "ankle_dorsiflexion":    {"required": 20,  "label": "Ankle Dorsiflexion"},
-            "ankle_plantarflexion":  {"required": 50,  "label": "Ankle Plantarflexion"},
-            "hip_internal_rotation": {"required": 30,  "label": "Hip Internal Rotation"},
-            "thoracic_rotation":     {"required": 35,  "label": "Thoracic Rotation"},
-            "hip_external_rotation": {"required": 35,  "label": "Hip External Rotation"},
+            "shoulder": {"label": "Shoulder ROM", "required_combined": 55, "required_left": 55, "required_right": 55},
+            "elbow":    {"label": "Elbow ROM",    "required_combined": 75, "required_left": 75, "required_right": 75},
+            "hip":      {"label": "Hip ROM",      "required_combined": 90, "required_left": 90, "required_right": 90},
+            "knee":     {"label": "Knee ROM",     "required_combined": 65, "required_left": 65, "required_right": 65},
         },
     },
     "crossfit": {
@@ -81,14 +65,10 @@ SPORT_BLUEPRINTS = {
         "tag": "Full body strength & power",
         "emoji": "🏋️",
         "joints": {
-            "shoulder_flexion":           {"required": 180, "label": "Shoulder Flexion"},
-            "shoulder_external_rotation": {"required": 90,  "label": "Shoulder External Rotation"},
-            "hip_flexion":                {"required": 135, "label": "Hip Flexion"},
-            "hip_external_rotation":      {"required": 45,  "label": "Hip External Rotation"},
-            "knee_flexion":               {"required": 140, "label": "Knee Flexion"},
-            "ankle_dorsiflexion":         {"required": 30,  "label": "Ankle Dorsiflexion"},
-            "thoracic_extension":         {"required": 25,  "label": "Thoracic Extension"},
-            "wrist_extension":            {"required": 75,  "label": "Wrist Extension"},
+            "shoulder": {"label": "Shoulder ROM", "required_combined": 100, "required_left": 100, "required_right": 100},
+            "elbow":    {"label": "Elbow ROM",    "required_combined": 105, "required_left": 105, "required_right": 105},
+            "hip":      {"label": "Hip ROM",      "required_combined": 95,  "required_left": 95,  "required_right": 95},
+            "knee":     {"label": "Knee ROM",     "required_combined": 85,  "required_left": 85,  "required_right": 85},
         },
     },
     "golf": {
@@ -96,13 +76,10 @@ SPORT_BLUEPRINTS = {
         "tag": "Rotational power",
         "emoji": "⛳",
         "joints": {
-            "thoracic_rotation":     {"required": 55, "label": "Thoracic Rotation"},
-            "hip_internal_rotation": {"required": 45, "label": "Hip Internal Rotation"},
-            "hip_external_rotation": {"required": 45, "label": "Hip External Rotation"},
-            "hip_flexion":           {"required": 110, "label": "Hip Flexion"},
-            "shoulder_external_rotation": {"required": 85, "label": "Shoulder External Rotation"},
-            "wrist_extension":       {"required": 65, "label": "Wrist Extension"},
-            "ankle_dorsiflexion":    {"required": 20, "label": "Ankle Dorsiflexion"},
+            "shoulder": {"label": "Shoulder ROM", "required_combined": 80, "required_left": 80, "required_right": 80},
+            "elbow":    {"label": "Elbow ROM",    "required_combined": 85, "required_left": 85, "required_right": 85},
+            "hip":      {"label": "Hip ROM",      "required_combined": 90, "required_left": 90, "required_right": 90},
+            "knee":     {"label": "Knee ROM",     "required_combined": 55, "required_left": 55, "required_right": 55},
         },
     },
     "volleyball": {
@@ -110,13 +87,10 @@ SPORT_BLUEPRINTS = {
         "tag": "Explosive overhead",
         "emoji": "🏐",
         "joints": {
-            "shoulder_flexion":           {"required": 175, "label": "Shoulder Flexion"},
-            "shoulder_external_rotation": {"required": 90,  "label": "Shoulder External Rotation"},
-            "hip_flexion":                {"required": 120, "label": "Hip Flexion"},
-            "knee_flexion":               {"required": 130, "label": "Knee Flexion"},
-            "ankle_dorsiflexion":         {"required": 25,  "label": "Ankle Dorsiflexion"},
-            "thoracic_rotation":          {"required": 40,  "label": "Thoracic Rotation"},
-            "wrist_extension":            {"required": 65,  "label": "Wrist Extension"},
+            "shoulder": {"label": "Shoulder ROM", "required_combined": 95, "required_left": 95, "required_right": 95},
+            "elbow":    {"label": "Elbow ROM",    "required_combined": 80, "required_left": 80, "required_right": 80},
+            "hip":      {"label": "Hip ROM",      "required_combined": 75, "required_left": 75, "required_right": 75},
+            "knee":     {"label": "Knee ROM",     "required_combined": 65, "required_left": 65, "required_right": 65},
         },
     },
     "baseball": {
@@ -124,13 +98,10 @@ SPORT_BLUEPRINTS = {
         "tag": "Rotational & throwing",
         "emoji": "⚾",
         "joints": {
-            "shoulder_external_rotation": {"required": 115, "label": "Shoulder External Rotation"},
-            "shoulder_internal_rotation": {"required": 60,  "label": "Shoulder Internal Rotation"},
-            "shoulder_flexion":           {"required": 170, "label": "Shoulder Flexion"},
-            "thoracic_rotation":          {"required": 50,  "label": "Thoracic Rotation"},
-            "hip_internal_rotation":      {"required": 40,  "label": "Hip Internal Rotation"},
-            "hip_external_rotation":      {"required": 45,  "label": "Hip External Rotation"},
-            "wrist_extension":            {"required": 60,  "label": "Wrist Extension"},
+            "shoulder": {"label": "Shoulder ROM", "required_combined": 110, "required_left": 110, "required_right": 110},
+            "elbow":    {"label": "Elbow ROM",    "required_combined": 95,  "required_left": 95,  "required_right": 95},
+            "hip":      {"label": "Hip ROM",      "required_combined": 85,  "required_left": 85,  "required_right": 85},
+            "knee":     {"label": "Knee ROM",     "required_combined": 65,  "required_left": 65,  "required_right": 65},
         },
     },
     "boxing": {
@@ -138,33 +109,48 @@ SPORT_BLUEPRINTS = {
         "tag": "Full body rotational",
         "emoji": "🥊",
         "joints": {
-            "shoulder_flexion":           {"required": 165, "label": "Shoulder Flexion"},
-            "shoulder_external_rotation": {"required": 75,  "label": "Shoulder External Rotation"},
-            "thoracic_rotation":          {"required": 50,  "label": "Thoracic Rotation"},
-            "hip_internal_rotation":      {"required": 40,  "label": "Hip Internal Rotation"},
-            "hip_external_rotation":      {"required": 40,  "label": "Hip External Rotation"},
-            "knee_flexion":               {"required": 125, "label": "Knee Flexion"},
-            "ankle_dorsiflexion":         {"required": 20,  "label": "Ankle Dorsiflexion"},
+            "shoulder": {"label": "Shoulder ROM", "required_combined": 80, "required_left": 80, "required_right": 80},
+            "elbow":    {"label": "Elbow ROM",    "required_combined": 95, "required_left": 95, "required_right": 95},
+            "hip":      {"label": "Hip ROM",      "required_combined": 80, "required_left": 80, "required_right": 80},
+            "knee":     {"label": "Knee ROM",     "required_combined": 65, "required_left": 65, "required_right": 65},
         },
     },
 }
 
-# Simulated user ROM — stands in for real MediaPipe output until pose.py is wired up
-DEMO_USER_MOBILITY = {
-    "shoulder_flexion":           148,
-    "shoulder_extension":          42,
-    "shoulder_external_rotation":  52,
-    "shoulder_internal_rotation":  55,
-    "thoracic_rotation":           28,
-    "thoracic_extension":          15,
-    "hip_flexion":                 98,
-    "hip_extension":               12,
-    "hip_internal_rotation":       22,
-    "hip_external_rotation":       30,
-    "knee_flexion":               118,
-    "ankle_dorsiflexion":          12,
-    "ankle_plantarflexion":        38,
-    "wrist_extension":             50,
+# Demo CV result — mirrors the exact output shape of cv/server.py
+# Used when no real CV recording is provided.
+DEMO_CV_RESULT = {
+    "overall_score": 47.7,
+    "joint_scores": {
+        "elbow":    {"left": 51.7, "right": 48.3, "combined": 50.0},
+        "knee":     {"left": 22.6, "right": 32.3, "combined": 27.4},
+        "hip":      {"left": 68.2, "right": 72.7, "combined": 70.5},
+        "shoulder": {"left": 46.4, "right": 39.3, "combined": 42.9},
+    },
+    "min_angles": {
+        "elbow_left": 65, "elbow_right": 65,
+        "knee_left": 125, "knee_right": 105,
+        "hip_left": 80,   "hip_right": 80,
+        "shoulder_left": 15, "shoulder_right": 25,
+    },
+    "max_angles": {
+        "elbow_left": 140, "elbow_right": 135,
+        "knee_left": 160,  "knee_right": 155,
+        "hip_left": 155,   "hip_right": 160,
+        "shoulder_left": 80, "shoulder_right": 80,
+    },
+    "session_rom": {
+        "elbow_left": 75,    "elbow_right": 70,
+        "knee_left": 35,     "knee_right": 50,
+        "hip_left": 75,      "hip_right": 80,
+        "shoulder_left": 65, "shoulder_right": 55,
+    },
+    "asymmetry_scores": {
+        "elbow": 0,
+        "knee": 0.0,
+        "hip": 5,
+        "shoulder": 5,
+    },
 }
 
 # Scoring thresholds (% of required ROM achieved)

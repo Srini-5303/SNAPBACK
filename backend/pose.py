@@ -1,35 +1,28 @@
 """
-Pose analysis stub — returns joint angles from video.
+Pose analysis — returns a CVResult-shaped dict from a recording session.
 
-Currently hardcoded with demo data from FRONTEND_SPEC.md.
-Replace get_joint_angles() body with real MediaPipe extraction when ready.
+Currently returns demo data matching the exact output of cv/server.py.
+Replace get_cv_result() with a call to the live CV server when available.
 """
 
-from typing import Optional, Dict
-from config import DEMO_USER_MOBILITY
+from typing import Optional, Dict, Any
+from config import DEMO_CV_RESULT
 
 
-def get_joint_angles(
-    video_path: Optional[str] = None,
+def get_cv_result(
     use_demo: bool = True,
-    provided: Optional[Dict[str, float]] = None,
-) -> Dict[str, float]:
+    provided: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
     """
-    Return a dict of joint_key → measured ROM in degrees.
+    Return a dict matching the CVResult shape (cv/server.py output).
 
-    Priority order:
-      1. `provided` dict (caller passed explicit values, e.g. from real MediaPipe output)
-      2. Demo data (DEMO_USER_MOBILITY from config) when use_demo=True
-      3. Demo data as fallback even if use_demo=False (until real MediaPipe is wired)
+    Priority:
+      1. `provided` — caller passed a real CV result (from /api/analyze request body)
+      2. Demo data from config when use_demo=True or no real data available
     """
     if provided:
         return provided
 
-    # TODO: replace with real MediaPipe extraction once pose.py is integrated
-    # Real implementation will look roughly like:
-    #   cap = cv2.VideoCapture(video_path)
-    #   with mp.solutions.pose.Pose(...) as pose:
-    #       angles = extract_angles_across_frames(cap, pose)
-    #   return compute_rom(angles)
-
-    return dict(DEMO_USER_MOBILITY)
+    # TODO: call the live CV server (http://localhost:5001) once it's running
+    # and capture its saved JSON result from the cv/results/ directory.
+    return dict(DEMO_CV_RESULT)
