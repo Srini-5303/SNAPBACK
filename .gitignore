@@ -29,3 +29,6 @@ output/
 
 # ── CV model weights (large binary, download separately) ──────
 *.task
+
+# ── CV session results ────────────────────────────────────────
+cv/results/

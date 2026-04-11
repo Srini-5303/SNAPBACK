@@ -16,8 +16,13 @@ Endpoints:
 
 from __future__ import annotations
 
+import json
 import threading
 import time
+from dataclasses import asdict
+from datetime import datetime
+from pathlib import Path
+from typing import Optional
 
 import cv2
 import numpy as np
@@ -27,8 +32,10 @@ from flask_cors import CORS
 from src.pose.estimator import PoseEstimator
 from src.pose.skeleton import SkeletonRenderer
 from src.analysis.angles import extract_angles
-from src.analysis.mobility import MobilityAnalyzer, build_joint_colors
+from src.analysis.mobility import MobilityAnalyzer, MobilityStatus, build_joint_colors
 from src.ui.overlay import OverlayRenderer, PANEL_WIDTH
+
+RESULTS_DIR = Path(__file__).parent / "results"
 
 VIDEO_PATH = r"C:\Users\aareg\Downloads\WhatsApp Video 2026-04-11 at 12.02.30 PM.mp4"
 MAX_CAM_PROBE = 4
@@ -46,6 +53,10 @@ _latest_frame: bytes | None = None
 _running  = False
 _paused   = False
 
+_status_lock  = threading.Lock()
+_last_status: Optional[MobilityStatus] = None
+_session_start: Optional[float] = None
+
 _source_lock      = threading.Lock()
 _source_pos       = 0          # index into _sources list
 _sources: list    = []         # built once when pipeline starts
@@ -60,14 +71,19 @@ _pipeline_thread: threading.Thread | None = None
 # ---------------------------------------------------------------------------
 
 def _probe_sources() -> list:
-    """Return ["video", 0, 1, …] depending on what's available."""
-    cams: list[int] = []
+    """Return [1, 0, …, "video"] — cam 1 first, cam 0 second, video last."""
+    available: set[int] = set()
     for i in range(MAX_CAM_PROBE):
         cap = cv2.VideoCapture(i)
         if cap.isOpened():
-            cams.append(i)
+            available.add(i)
         cap.release()
-    return (["video"] if VIDEO_PATH else []) + cams
+    # Fixed preferred order: 1, 0, then any remaining cams ascending
+    ordered = [i for i in [1, 0] if i in available]
+    ordered += sorted(i for i in available if i not in [1, 0])
+    if VIDEO_PATH:
+        ordered.append("video")
+    return ordered
 
 
 def _open_source(src) -> tuple[cv2.VideoCapture, bool, str]:
@@ -88,7 +104,9 @@ def _open_source(src) -> tuple[cv2.VideoCapture, bool, str]:
 def _analysis_loop() -> None:
     global _latest_frame, _running, _paused
     global _sources, _source_pos, _switch_requested, _current_label
+    global _last_status, _session_start
 
+    _session_start = time.time()
     _sources = _probe_sources()
     if not _sources:
         print("[server] ERROR: no video source found")
@@ -144,6 +162,8 @@ def _analysis_loop() -> None:
                     status      = analyzer.update(angles)
                     last_angles = angles
                     last_status = status
+                    with _status_lock:
+                        _last_status = status
                     joint_colors = build_joint_colors(status) if status else {}
                     frame = skeleton.render(
                         frame, pose_result, joint_colors, frame_shape=(h, w))
@@ -184,6 +204,47 @@ def _generate_stream():
 
 
 # ---------------------------------------------------------------------------
+# Session save
+# ---------------------------------------------------------------------------
+
+def _save_session() -> Optional[dict]:
+    """Serialize the last MobilityStatus to a timestamped JSON file.
+    Returns the saved data dict, or None if there's nothing to save."""
+    with _status_lock:
+        status = _last_status
+
+    if status is None:
+        return None
+
+    duration = round(time.time() - _session_start, 1) if _session_start else 0
+
+    # dataclasses.asdict handles nested dataclasses (JointScore, JointStatus)
+    data = {
+        "timestamp":    datetime.now().isoformat(timespec="seconds"),
+        "duration_sec": duration,
+        "overall_score": round(status.overall_score, 1),
+        "joint_scores": {
+            pair: {
+                "left":     round(js.left, 1),
+                "right":    round(js.right, 1),
+                "combined": round(js.combined, 1),
+            }
+            for pair, js in status.joint_scores.items()
+        },
+        "min_angles":       {k: round(v, 1) for k, v in status.min_angles.items()},
+        "max_angles":       {k: round(v, 1) for k, v in status.max_angles.items()},
+        "session_rom":      {k: round(v, 1) for k, v in status.session_rom.items()},
+        "asymmetry_scores": {k: round(v, 1) for k, v in status.asymmetry_scores.items()},
+    }
+
+    RESULTS_DIR.mkdir(exist_ok=True)
+    filename = RESULTS_DIR / f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    filename.write_text(json.dumps(data, indent=2))
+    print(f"[server] session saved → {filename}")
+    return data
+
+
+# ---------------------------------------------------------------------------
 # Routes
 # ---------------------------------------------------------------------------
 
@@ -208,7 +269,8 @@ def start():
 def stop():
     global _running
     _running = False
-    return jsonify({'status': 'stopped'})
+    saved = _save_session()
+    return jsonify({'status': 'stopped', 'session': saved})
 
 
 @app.route('/pause', methods=['POST'])
