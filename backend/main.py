@@ -9,7 +9,9 @@ Run:
   uvicorn main:app --reload --port 8000
 """
 
-import anthropic
+from dotenv import load_dotenv
+load_dotenv()  # loads backend/.env before anything else reads os.environ
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -17,7 +19,7 @@ from config import SPORT_BLUEPRINTS
 from models import AnalyzeRequest, AnalysisResponse
 from pose import get_joint_angles
 from gap_analysis import compute_gaps
-from claude_client import generate_plan
+from claude_client import generate_plan, generate_sport_preview
 
 app = FastAPI(title="SNAPBACK API", version="0.1.0")
 
@@ -51,6 +53,27 @@ def list_sports():
         }
         for key, bp in SPORT_BLUEPRINTS.items()
     ]
+
+
+# ── Sport preview ────────────────────────────────────────────────────────────
+
+@app.get("/api/sport-preview/{sport}")
+def sport_preview(sport: str):
+    """
+    Called immediately after sport selection (before any video/analysis).
+    Returns 4 Claude-generated sport-specific exercises shown on Step 2.
+    """
+    if sport not in SPORT_BLUEPRINTS:
+        raise HTTPException(status_code=400, detail=f"Unknown sport '{sport}'")
+
+    blueprint = SPORT_BLUEPRINTS[sport]
+    exercises = generate_sport_preview(blueprint["name"], blueprint["joints"])
+
+    return {
+        "sport":      sport,
+        "sport_name": blueprint["name"],
+        "exercises":  exercises,
+    }
 
 
 # ── Main analysis pipeline ────────────────────────────────────────────────────

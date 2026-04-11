@@ -2,28 +2,54 @@ import { createContext, useContext, useState } from 'react';
 import { demoUserMobility } from '../data/demoUserMobility.js';
 import { demoExercisePlan } from '../data/demoExercisePlan.js';
 import { computeGapAnalysis } from '../utils/gapAnalysis.js';
+import { fetchSportPreview, analyzeMovement } from '../utils/api.js';
 
 const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
-  const [selectedSport, setSelectedSport] = useState(null);
-  const [gapAnalysis, setGapAnalysis]     = useState(null);
-  const [exercisePlan, setExercisePlan]   = useState(null);
+  const [selectedSport, setSelectedSport]           = useState(null);
+  const [gapAnalysis, setGapAnalysis]               = useState(null);
+  const [exercisePlan, setExercisePlan]             = useState(null);
+  const [sportExercises, setSportExercises]         = useState(null);
+  const [sportExercisesLoading, setSportExercisesLoading] = useState(false);
+  const [analysisLoading, setAnalysisLoading]       = useState(false);
 
   function selectSport(sportKey) {
     setSelectedSport(sportKey);
   }
 
-  function runAnalysis(sportKey) {
-    const analysis = computeGapAnalysis(sportKey, demoUserMobility);
-    setGapAnalysis(analysis);
-    const plan = demoExercisePlan[sportKey] ?? demoExercisePlan.tennis;
-    setExercisePlan(plan);
+  async function loadSportPreview(sportKey) {
+    setSportExercisesLoading(true);
+    setSportExercises(null);
+    try {
+      const exercises = await fetchSportPreview(sportKey);
+      setSportExercises(exercises);
+    } catch {
+      setSportExercises(null);
+    } finally {
+      setSportExercisesLoading(false);
+    }
   }
 
-  function switchSport(sportKey) {
+  async function runAnalysis(sportKey) {
+    setAnalysisLoading(true);
+    try {
+      const { gapAnalysis: ga, exercisePlan: ep } = await analyzeMovement(sportKey);
+      setGapAnalysis(ga);
+      setExercisePlan(ep);
+    } catch {
+      // Fallback to local computation if backend is unavailable
+      const ga = computeGapAnalysis(sportKey, demoUserMobility);
+      setGapAnalysis(ga);
+      setExercisePlan(demoExercisePlan[sportKey] ?? demoExercisePlan.tennis);
+    } finally {
+      setAnalysisLoading(false);
+    }
+  }
+
+  async function switchSport(sportKey) {
     setSelectedSport(sportKey);
-    runAnalysis(sportKey);
+    await runAnalysis(sportKey);
   }
 
   return (
@@ -31,7 +57,11 @@ export function AppProvider({ children }) {
       selectedSport,
       gapAnalysis,
       exercisePlan,
+      sportExercises,
+      sportExercisesLoading,
+      analysisLoading,
       selectSport,
+      loadSportPreview,
       runAnalysis,
       switchSport,
     }}>
