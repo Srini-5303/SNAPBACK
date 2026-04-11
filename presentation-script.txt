@@ -1,0 +1,47 @@
+[Slide 1 — Title] (~15 sec)
+"Every athlete knows the feeling — you've had time away from your sport, and you're itching to get back. But your body isn't always where your head is. That's the problem SNAPBACK was built to solve."
+
+---
+
+[Slide 2 — The Problem] (~30 sec)
+"When athletes take a break — whether it's injury, life, or a long off-season — mobility quietly declines. They don't feel it happening. So they jump straight back into training and that's when injuries strike. The real issue is there's no accessible, data-driven way to check what you've actually lost before you return. Most athletes feel ready long before their body actually is."
+
+---
+
+[Slide 3 — Three Steps] (~30 sec)
+"SNAPBACK fixes this in three steps. First, you pick your sport — basketball, tennis, golf, whatever you're returning to. Each sport has a unique mobility blueprint. Second, you stand in front of your camera — no wearables, no clinic visit — and our CV engine measures your range of motion across eight key joints in real time. Third, you get a personalised, week-by-week exercise plan targeting exactly what you're missing."
+
+---
+
+[Slide 4 — Technology] (~25 sec)
+"Under the hood we're running MediaPipe, which tracks 33 skeletal landmarks at 30 frames per second. We compute joint angles live, smooth out jitter with EMA filtering, and flag asymmetry the moment it appears — yellow at 15 degrees difference, red at 30. Everything runs on a single webcam."
+
+---
+
+[Slide 5 — Outcome Table] (~20 sec)
+"The output is a mobility score from zero to a hundred, benchmarked against clinical reference ranges for your specific sport. You can see exactly which joints need the most work and roughly how long recovery will take."
+
+---
+
+[Slide 6 — CV Screenshot] (~15 sec)
+"This is the live analysis running — skeleton overlay, joint scores, asymmetry flags, all in real time. In this session you can see a mobility score of 38 out of 100, with the knee flagged as a priority."
+
+---
+
+[Slide 7 — Gap Analysis Screenshot] (~15 sec)
+"And this is what the athlete sees in the webapp — a sport-specific gap analysis showing exactly where they stand against what tennis demands from each joint."
+
+---
+
+[Slide 8 — Plan Screenshot] (~15 sec)
+"One click later, they have a four-week return-to-sport plan. Targeted exercises, sets, reps, and the reasoning behind every single one."
+
+---
+
+[Slide 9 — Thank You] (~15 sec)
+"SNAPBACK — not 'get fit'. Get back. Happy to take any questions."
+
+---
+
+Total: ~2 min 50 sec at a comfortable pace.
+Slow down slightly on slides 3 and 4 if you need to fill the full three minutes.

@@ -2,46 +2,6 @@
   padding: 32px 0 64px;
 }
 
-/* ── Gender toggle ────────────────────────────────────────── */
-.gender-toggle-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.gender-toggle {
-  display: flex;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 99px;
-  padding: 3px;
-  gap: 2px;
-}
-
-.gender-btn {
-  padding: 5px 18px;
-  border-radius: 99px;
-  border: none;
-  background: transparent;
-  color: var(--color-text-muted);
-  font-size: 0.78rem;
-  font-family: var(--font-body);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  letter-spacing: 0.04em;
-}
-
-.gender-btn:hover {
-  color: var(--color-accent);
-}
-
-.gender-btn.active {
-  background: var(--color-accent-dim);
-  color: var(--color-accent);
-  box-shadow: 0 0 10px var(--color-accent-glow);
-}
-
 /* ── Sport switcher ───────────────────────────────────────── */
 .sport-switcher {
   display: flex;
@@ -93,52 +53,6 @@
   box-shadow: 0 0 12px var(--color-accent-glow);
 }
 
-/* ── Split layout ─────────────────────────────────────────── */
-.body-map-layout {
-  display: grid;
-  grid-template-columns: 55% 1fr;
-  gap: 32px;
-  min-height: 600px;
-}
-
-.body-map-left {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-}
-
-.body-map-right {
-  overflow: hidden;
-}
-
-/* ── Legend ───────────────────────────────────────────────── */
-.body-map-legend {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.legend-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
-}
-
-.legend-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.legend-teal   { background: var(--color-accent); box-shadow: 0 0 5px var(--color-accent); }
-.legend-yellow { background: var(--color-yellow); }
-.legend-red    { background: var(--color-red);    box-shadow: 0 0 5px var(--color-red); }
-
 /* ── Loading skeleton for analysis panel ─────────────────── */
 .analysis-loading {
   display: flex;
@@ -158,16 +72,3 @@
   border-radius: var(--radius-sm);
 }
 
-/* ── Mobile ───────────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .body-map-layout {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  .body-map-left {
-    max-width: 320px;
-    width: 100%;
-    margin: 0 auto;
-  }
-}
