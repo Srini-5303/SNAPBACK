@@ -37,12 +37,16 @@ const MOVEMENTS = [
   },
 ];
 
+const STREAM_URL = 'http://localhost:5001';
+
 export default function MovementRecording() {
   const { selectedSport, runAnalysis } = useApp();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const [videoReady, setVideoReady] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
   function handleFileUpload(e) {
     const file = e.target.files?.[0];
@@ -51,6 +55,31 @@ export default function MovementRecording() {
 
   function handleDemoVideo() {
     setVideoReady(true);
+  }
+
+  function handleStartStream() {
+    // Update UI immediately so the button feels instant
+    setIsStreaming(true);
+    setVideoReady(true);
+    // Start the pipeline in the background (fire and forget)
+    fetch(`${STREAM_URL}/start`, { method: 'POST' }).catch(console.error);
+  }
+
+  function handlePauseStream() {
+    const next = !isPaused;
+    setIsPaused(next);
+    fetch(`${STREAM_URL}/${next ? 'pause' : 'resume'}`, { method: 'POST' }).catch(console.error);
+  }
+
+  function handleStopStream() {
+    setIsStreaming(false);
+    setIsPaused(false);
+    setVideoReady(false);
+    fetch(`${STREAM_URL}/stop`, { method: 'POST' }).catch(console.error);
+  }
+
+  function handleSwitchCamera() {
+    fetch(`${STREAM_URL}/switch`, { method: 'POST' }).catch(console.error);
   }
 
   function handleAnalyze() {
@@ -78,7 +107,7 @@ export default function MovementRecording() {
           {!videoReady ? (
             <>
               <div className="upload-buttons">
-                <button className="btn-record" onClick={() => fileInputRef.current?.click()}>
+                <button className="btn-record" onClick={handleStartStream}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M23 7l-7 5 7 5V7z" /><rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
                   </svg>
@@ -111,7 +140,7 @@ export default function MovementRecording() {
                 </svg>
               </div>
               <div className="video-ready-text">
-                <span className="video-ready-title">Video received</span>
+                <span className="video-ready-title">{isStreaming ? 'Live analysis running' : 'Video received'}</span>
                 <span className="video-ready-sub">Ready to analyze your movement patterns</span>
               </div>
             </div>
@@ -132,6 +161,39 @@ export default function MovementRecording() {
             )}
           </button>
         </div>
+
+        {isStreaming && (
+          <div className="stream-container">
+            <div className="stream-controls">
+              <button className="stream-btn" onClick={handlePauseStream}>
+                {isPaused ? (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    Resume
+                  </>
+                ) : (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                    Pause
+                  </>
+                )}
+              </button>
+              <button className="stream-btn" onClick={handleSwitchCamera}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+                Switch Camera
+              </button>
+              <button className="stream-btn stream-btn-stop" onClick={handleStopStream}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                Stop
+              </button>
+            </div>
+            <img
+              src={`${STREAM_URL}/stream`}
+              alt="Live mobility analysis"
+              className="stream-img"
+            />
+          </div>
+        )}
       </div>
     </div>
   );

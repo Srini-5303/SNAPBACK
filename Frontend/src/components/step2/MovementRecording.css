@@ -200,6 +200,57 @@
   cursor: not-allowed;
 }
 
+/* ── Live Stream ──────────────────────────────────────────── */
+.stream-container {
+  margin-top: 32px;
+  border: 1px solid var(--color-border-hover);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #000;
+}
+
+.stream-controls {
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.stream-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-hover);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-family: var(--font-body);
+  transition: all var(--transition-fast);
+}
+
+.stream-btn:hover {
+  background: var(--color-accent-dim);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.stream-btn-stop:hover {
+  background: var(--color-red-dim);
+  border-color: var(--color-red);
+  color: var(--color-red);
+}
+
+.stream-img {
+  width: 100%;
+  max-height: 520px;
+  object-fit: contain;
+  display: block;
+}
+
 @media (max-width: 768px) {
   .movement-grid {
     grid-template-columns: repeat(2, 1fr);
