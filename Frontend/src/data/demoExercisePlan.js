@@ -1,0 +1,257 @@
+// Hardcoded 4-week plans per sport.
+// Shape: { weeks: [{ weekNumber, focus, exercises: [{ name, targetJoint, targetColor, sets, reps, holdTime, description, rationale }] }] }
+// targetColor: 'red' | 'yellow' | 'green'
+
+const plans = {
+  tennis: {
+    weeks: [
+      {
+        weekNumber: 1,
+        focus: 'Foundation — restore baseline shoulder & thoracic mobility',
+        exercises: [
+          {
+            name: 'Doorway Chest Opener',
+            targetJoint: 'Shoulder External Rotation',
+            targetColor: 'red',
+            sets: 3, reps: null, holdTime: '30 sec each side',
+            description: 'Stand in a doorway, forearm on the frame at 90°. Gently rotate your body away until you feel a stretch across the chest and front shoulder.',
+            rationale: 'Your shoulder external rotation is 38° below the 90° tennis requires for a proper service motion. This opener restores the posterior capsule flexibility first.',
+          },
+          {
+            name: 'Thread the Needle',
+            targetJoint: 'Thoracic Rotation',
+            targetColor: 'red',
+            sets: 3, reps: '8 each side', holdTime: null,
+            description: 'On all fours, slide one arm under your body as far as possible, rotating from the upper back. Return and repeat.',
+            rationale: 'Thoracic rotation of 28° is 17° short of tennis needs. Ground-based rotation drills retrain the upper spine without loading it.',
+          },
+          {
+            name: 'Supine Hip Flexor Stretch',
+            targetJoint: 'Hip Flexion',
+            targetColor: 'red',
+            sets: 3, reps: null, holdTime: '45 sec each side',
+            description: 'Lie on the edge of a table or bed. Pull one knee to chest while letting the other leg hang. Keep the lower back flat.',
+            rationale: 'Hip flexion of 98° is 22° short of the 120° tennis demands for split-step loading and groundstroke stance.',
+          },
+          {
+            name: 'Half-Kneeling Hip IR Stretch',
+            targetJoint: 'Hip Internal Rotation',
+            targetColor: 'red',
+            sets: 3, reps: null, holdTime: '30 sec each side',
+            description: 'Kneel on one knee. Shift your weight forward over the front foot and internally rotate the back hip by pushing the knee inward.',
+            rationale: 'Hip IR at 22° is 13° below tennis requirement. Restricted hip IR transfers stress to the knee and lower back during lateral movement.',
+          },
+          {
+            name: 'Calf Raises with Pause',
+            targetJoint: 'Ankle Dorsiflexion',
+            targetColor: 'yellow',
+            sets: 3, reps: '12', holdTime: null,
+            description: 'Stand on a step, lower heel below the step edge (loaded stretch), pause 2 sec, then rise to tiptoe.',
+            rationale: 'Ankle dorsiflexion of 12° is 8° short of tennis requirement. Restricted dorsiflexion limits your ability to load into the court surface explosively.',
+          },
+        ],
+      },
+      {
+        weekNumber: 2,
+        focus: 'Load tolerance — add gentle resistance to mobility patterns',
+        exercises: [
+          {
+            name: 'Band Pull-Apart',
+            targetJoint: 'Shoulder External Rotation',
+            targetColor: 'red',
+            sets: 3, reps: '15', holdTime: null,
+            description: 'Hold a light resistance band at shoulder height, arms straight. Pull apart until the band touches your chest. Control the return.',
+            rationale: 'Builds rotator cuff strength in the newly acquired range from Week 1. Prepares the shoulder for the external rotation forces of a tennis serve.',
+          },
+          {
+            name: 'Thoracic Rotation with Dowel',
+            targetJoint: 'Thoracic Rotation',
+            targetColor: 'red',
+            sets: 3, reps: '10 each side', holdTime: null,
+            description: 'Sit cross-legged, dowel across shoulders behind neck. Rotate as far as possible to each side, holding 2 seconds at end range.',
+            rationale: 'Adds load and range to the thoracic rotation gains from Week 1.',
+          },
+          {
+            name: 'Hip 90/90 Stretch',
+            targetJoint: 'Hip Internal Rotation',
+            targetColor: 'red',
+            sets: 3, reps: null, holdTime: '45 sec each side',
+            description: 'Sit with both knees at 90°, one leg in front, one to the side. Lean forward over the front shin to stretch the rear hip IR.',
+            rationale: 'Deeper hip IR stretch in a more sport-specific position, building on the kneeling work from Week 1.',
+          },
+          {
+            name: 'Step-Up Knee Drive',
+            targetJoint: 'Hip Flexion',
+            targetColor: 'red',
+            sets: 3, reps: '10 each side', holdTime: null,
+            description: 'Step onto a 12-inch box, drive the trailing knee up above hip height, balance for 1 second, step down.',
+            rationale: 'Actively moves the hip through a larger flexion range under partial bodyweight load.',
+          },
+          {
+            name: 'Ankle Dorsiflexion Wall Drill',
+            targetJoint: 'Ankle Dorsiflexion',
+            targetColor: 'yellow',
+            sets: 3, reps: '12 each side', holdTime: null,
+            description: 'Stand facing a wall. Drive your knee toward the wall over your toes, keeping heel flat. Increase distance from wall as range improves.',
+            rationale: 'Active dorsiflexion loading restores the range needed for court split-steps.',
+          },
+        ],
+      },
+      {
+        weekNumber: 3,
+        focus: 'Sport specificity — integrate mobility into tennis movement patterns',
+        exercises: [
+          {
+            name: 'External Rotation Side-Lying Cable',
+            targetJoint: 'Shoulder External Rotation',
+            targetColor: 'red',
+            sets: 3, reps: '12', holdTime: null,
+            description: 'Lie on your side, elbow at 90°. Rotate forearm up against resistance, pause at top, lower slowly.',
+            rationale: 'Strengthens shoulder ER in full range — directly targets the serve and overhead mechanics.',
+          },
+          {
+            name: 'Rotational Medicine Ball Slam',
+            targetJoint: 'Thoracic Rotation',
+            targetColor: 'red',
+            sets: 3, reps: '8 each side', holdTime: null,
+            description: 'Stand side-on to a wall, light med ball. Rotate away from wall loading, then explosively rotate toward wall and release.',
+            rationale: 'Trains thoracic rotation under speed — replicates the rotational demand of groundstrokes.',
+          },
+          {
+            name: 'Split Squat with Reach',
+            targetJoint: 'Hip Flexion',
+            targetColor: 'red',
+            sets: 3, reps: '8 each side', holdTime: null,
+            description: 'Lunge position. Lower into the lunge while reaching both arms overhead. Hold 2 seconds at depth.',
+            rationale: 'Combines hip flexion depth with overhead reach — mirrors the tennis serve preparation position.',
+          },
+          {
+            name: 'Lateral Band Walk',
+            targetJoint: 'Hip Internal Rotation',
+            targetColor: 'red',
+            sets: 3, reps: '15 steps each way', holdTime: null,
+            description: 'Band around knees, half-squat position. Step laterally maintaining tension on the band and slight hip IR.',
+            rationale: 'Builds hip IR endurance needed for repeated lateral movement in tennis.',
+          },
+          {
+            name: 'Single-Leg Calf Raise',
+            targetJoint: 'Ankle Dorsiflexion',
+            targetColor: 'yellow',
+            sets: 3, reps: '15', holdTime: null,
+            description: 'Single leg on a step edge. Full range of motion from loaded stretch to full plantarflexion.',
+            rationale: 'Progresses ankle work to single-leg loading — matches the demands of the tennis push-off.',
+          },
+        ],
+      },
+      {
+        weekNumber: 4,
+        focus: 'Return prep — full movement integration & sport-specific drills',
+        exercises: [
+          {
+            name: 'Serve Shadow Swings',
+            targetJoint: 'Shoulder External Rotation',
+            targetColor: 'red',
+            sets: 3, reps: '10', holdTime: null,
+            description: 'Mimic the full tennis serve motion slowly, pausing at the trophy position to feel maximum external rotation. Increase speed each set.',
+            rationale: 'Integrates the recovered shoulder ER range into the actual serve pattern before returning to court.',
+          },
+          {
+            name: 'Rotational Lunge with Twist',
+            targetJoint: 'Thoracic Rotation',
+            targetColor: 'red',
+            sets: 3, reps: '8 each side', holdTime: null,
+            description: 'Step into a forward lunge, rotate torso fully to the same side as the front leg. Arms reach across.',
+            rationale: 'Full-body integration: hip flexion + thoracic rotation in a sport-specific lunge pattern.',
+          },
+          {
+            name: 'Hip Mobility Flow',
+            targetJoint: 'Hip Flexion',
+            targetColor: 'red',
+            sets: 2, reps: null, holdTime: '5 min flow',
+            description: 'Continuous movement through: 90/90 → pigeon → lizard → deep squat. 30 seconds per position.',
+            rationale: 'Maintains all hip gains in a time-efficient flow — suitable for pre-practice warm-up going forward.',
+          },
+          {
+            name: 'Lateral Shuffle with Direction Change',
+            targetJoint: 'Ankle Dorsiflexion',
+            targetColor: 'yellow',
+            sets: 4, reps: '20m each direction', holdTime: null,
+            description: 'Athletic stance, shuffle laterally, plant hard and reverse direction. Focus on ankle bend at each plant.',
+            rationale: 'Final integration drill — loads the ankle in the actual court movement pattern.',
+          },
+          {
+            name: 'Wrist Circles & Loaded Extension',
+            targetJoint: 'Wrist Extension',
+            targetColor: 'yellow',
+            sets: 3, reps: '10 each direction', holdTime: null,
+            description: 'Full wrist circles, then palm-down loaded wrist extension against a light band.',
+            rationale: 'Wrist extension at 50° is 20° short of tennis requirement. Prepares the wrist for racquet impact forces.',
+          },
+        ],
+      },
+    ],
+  },
+};
+
+// For sports without a custom plan, generate a generic plan
+const genericPlan = (sportName) => ({
+  weeks: [1, 2, 3, 4].map((w) => ({
+    weekNumber: w,
+    focus: `Week ${w} — Progressive mobility for ${sportName}`,
+    exercises: [
+      {
+        name: 'Hip 90/90 Mobility Flow',
+        targetJoint: 'Hip Flexion',
+        targetColor: 'red',
+        sets: 3, reps: null, holdTime: '30 sec each side',
+        description: 'Sit with both knees at 90°. Alternate between internal and external rotation, holding end ranges.',
+        rationale: 'Hip mobility is a universal foundation for all sports. Addresses the most commonly restricted joint pattern.',
+      },
+      {
+        name: 'Thoracic Rotation Stretch',
+        targetJoint: 'Thoracic Rotation',
+        targetColor: 'red',
+        sets: 3, reps: '8 each side', holdTime: null,
+        description: 'On all fours, thread one arm under your body. Rotate from the upper back, not the lower.',
+        rationale: 'Thoracic stiffness limits all rotational sports. This drill restores upper spine mobility safely.',
+      },
+      {
+        name: 'Ankle Dorsiflexion Wall Drill',
+        targetJoint: 'Ankle Dorsiflexion',
+        targetColor: 'yellow',
+        sets: 3, reps: '12 each side', holdTime: null,
+        description: 'Stand facing a wall, drive knee toward wall over toes keeping heel flat.',
+        rationale: 'Ankle restriction is frequently the hidden limiter in explosive sport movements.',
+      },
+      {
+        name: 'Shoulder External Rotation Band',
+        targetJoint: 'Shoulder External Rotation',
+        targetColor: 'yellow',
+        sets: 3, reps: '15', holdTime: null,
+        description: 'Elbow at 90°, band at waist. Rotate forearm outward against band resistance.',
+        rationale: 'Posterior shoulder health supports all overhead and throwing patterns.',
+      },
+      {
+        name: 'Deep Squat Hold',
+        targetJoint: 'Knee Flexion',
+        targetColor: 'green',
+        sets: 3, reps: null, holdTime: '45 sec',
+        description: 'Feet shoulder-width, sink into the deepest squat possible while keeping heels down. Hold position.',
+        rationale: 'Full knee flexion range is essential for change-of-direction and deceleration mechanics in all sports.',
+      },
+    ],
+  })),
+});
+
+export const demoExercisePlan = {
+  tennis:     plans.tennis,
+  soccer:     genericPlan('Soccer'),
+  basketball: genericPlan('Basketball'),
+  swimming:   genericPlan('Swimming'),
+  running:    genericPlan('Running'),
+  crossfit:   genericPlan('CrossFit'),
+  golf:       genericPlan('Golf'),
+  volleyball: genericPlan('Volleyball'),
+  baseball:   genericPlan('Baseball'),
+  boxing:     genericPlan('Boxing'),
+};

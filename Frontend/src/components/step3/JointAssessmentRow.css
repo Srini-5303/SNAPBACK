@@ -1,0 +1,88 @@
+.joint-row {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.joint-row:last-child {
+  border-bottom: none;
+}
+
+.joint-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.joint-row-name {
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.joint-row-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: 99px;
+  text-transform: uppercase;
+}
+
+.badge-priority { background: var(--color-red-dim);    color: var(--color-red); }
+.badge-moderate { background: var(--color-yellow-dim); color: var(--color-yellow); }
+.badge-good     { background: var(--color-accent-dim); color: var(--color-accent); }
+
+.joint-row-angles {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.joint-row-angle {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.angle-label {
+  font-size: 0.6rem;
+  color: var(--color-text-dim);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.angle-value {
+  font-family: var(--font-heading);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.gap-angle.gap-priority .angle-value { color: var(--color-red); }
+.gap-angle.gap-moderate .angle-value { color: var(--color-yellow); }
+.gap-angle.gap-good     .angle-value { color: var(--color-accent); }
+
+/* ── Mini bar chart ───────────────────────────────────────── */
+.joint-row-bar {
+  width: 100%;
+}
+
+.bar-track {
+  position: relative;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.8s var(--ease-athletic);
+}
+
+.bar-fill-priority { background: var(--color-red);    box-shadow: 0 0 6px var(--color-red-glow); }
+.bar-fill-moderate { background: var(--color-yellow); }
+.bar-fill-good     { background: var(--color-accent); box-shadow: 0 0 6px var(--color-accent-glow); }

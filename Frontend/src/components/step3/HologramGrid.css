@@ -1,0 +1,13 @@
+.hologram-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.hologram-grid-svg {
+  width: 100%;
+  height: 100%;
+  opacity: 0.6;
+}

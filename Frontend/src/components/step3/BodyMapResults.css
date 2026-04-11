@@ -1,0 +1,133 @@
+.body-map-results {
+  padding: 32px 0 64px;
+}
+
+/* ── Sport switcher ───────────────────────────────────────── */
+.sport-switcher {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.sport-switcher-label {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sport-switcher-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sport-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 99px;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: var(--font-body);
+}
+
+.sport-pill:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.sport-pill.active {
+  background: var(--color-accent-dim);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  box-shadow: 0 0 12px var(--color-accent-glow);
+}
+
+/* ── Split layout ─────────────────────────────────────────── */
+.body-map-layout {
+  display: grid;
+  grid-template-columns: 55% 1fr;
+  gap: 32px;
+  min-height: 600px;
+}
+
+.body-map-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.body-map-right {
+  overflow: hidden;
+}
+
+/* ── Legend ───────────────────────────────────────────────── */
+.body-map-legend {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-teal   { background: var(--color-accent); box-shadow: 0 0 5px var(--color-accent); }
+.legend-yellow { background: var(--color-yellow); }
+.legend-red    { background: var(--color-red);    box-shadow: 0 0 5px var(--color-red); }
+
+/* ── Loading skeleton for analysis panel ─────────────────── */
+.analysis-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 8px;
+}
+
+.analysis-loading-title {
+  height: 28px;
+  width: 75%;
+  border-radius: var(--radius-sm);
+}
+
+.analysis-loading-row {
+  height: 60px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Mobile ───────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .body-map-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .body-map-left {
+    max-width: 320px;
+    width: 100%;
+    margin: 0 auto;
+  }
+}

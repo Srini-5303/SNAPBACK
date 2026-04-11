@@ -1,0 +1,44 @@
+.hologram-body-map {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto;
+  background: rgba(0, 229, 204, 0.015);
+  border: 1px solid rgba(0, 229, 204, 0.1);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* 3D canvas version — needs explicit height (canvas can't auto-size) */
+.hologram-body-map-3d {
+  height: 520px;
+}
+
+/* R3F canvas fills the container */
+.hologram-body-map-3d canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+/* ── HUD wrappers for in-scene Html overlays ──────────────── */
+/* Resets the absolute positioning that JointHUD normally uses  */
+.hud-scene-wrapper .joint-hud {
+  position: relative;
+  top: auto;
+  left: auto;
+  right: auto;
+}
+
+/* Push panel left or right of the joint anchor */
+.hud-scene-right {
+  transform: translateX(10px);
+}
+.hud-scene-left {
+  transform: translateX(calc(-100% - 10px));
+}
+
+/* ── Connector line (hide the 2D connector in scene mode) ─── */
+.hud-scene-wrapper .hud-connector {
+  display: none;
+}

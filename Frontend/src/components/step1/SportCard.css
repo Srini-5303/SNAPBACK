@@ -1,0 +1,80 @@
+.sport-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 16px 20px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition:
+    transform var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
+  text-align: center;
+  width: 100%;
+}
+
+.sport-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-border-hover);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.sport-card.selected {
+  border-color: var(--color-accent);
+  background: var(--color-accent-dim);
+  box-shadow:
+    0 0 0 1px var(--color-accent),
+    0 0 24px var(--color-accent-glow),
+    0 8px 24px rgba(0, 0, 0, 0.3);
+  transform: translateY(-4px);
+}
+
+.sport-card-emoji {
+  font-size: 2rem;
+  line-height: 1;
+  display: block;
+}
+
+.sport-card-name {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-text);
+}
+
+.sport-card-tag {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sport-card.selected .sport-card-name {
+  color: var(--color-accent);
+}
+
+.sport-card.selected .sport-card-tag {
+  color: var(--color-accent);
+  opacity: 0.7;
+}
+
+.sport-card-check {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  color: var(--color-bg);
+  font-weight: 800;
+}

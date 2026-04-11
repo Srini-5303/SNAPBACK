@@ -1,0 +1,126 @@
+.exercise-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.exercise-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-border-hover);
+}
+
+.exercise-card-red    { border-left: 3px solid var(--color-red); }
+.exercise-card-yellow { border-left: 3px solid var(--color-yellow); }
+.exercise-card-green  { border-left: 3px solid var(--color-green); }
+
+.exercise-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.exercise-card-index {
+  font-family: var(--font-heading);
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--color-text-dim);
+  letter-spacing: 0.06em;
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+
+.exercise-card-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.exercise-card-name {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--color-text);
+}
+
+.exercise-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.exercise-target {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.exercise-target-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.exercise-prescription {
+  font-family: var(--font-heading);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.exercise-description {
+  font-size: 0.83rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+/* ── Why toggle ───────────────────────────────────────────── */
+.exercise-why-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity var(--transition-fast);
+  font-family: var(--font-body);
+}
+
+.exercise-why-toggle:hover {
+  opacity: 0.75;
+}
+
+/* ── Why panel accordion ──────────────────────────────────── */
+.exercise-why-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s var(--ease-athletic), padding 0.3s var(--ease-athletic);
+}
+
+.exercise-why-panel.open {
+  max-height: 200px;
+  padding-top: 12px;
+}
+
+.exercise-why-panel p {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  padding: 12px 14px;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+  border-left: 2px solid var(--color-accent-dim);
+}

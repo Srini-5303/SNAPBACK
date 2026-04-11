@@ -1,0 +1,117 @@
+.scan-animation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 40px 20px;
+  width: 100%;
+}
+
+.scan-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  letter-spacing: 0.04em;
+}
+
+.scan-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 8px var(--color-accent);
+  animation: blink 1s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.2; }
+}
+
+.scan-cursor {
+  animation: blink 0.8s step-end infinite;
+  color: var(--color-accent);
+  margin-left: 2px;
+}
+
+.scan-body-skeleton {
+  position: relative;
+  width: 180px;
+  height: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.skel {
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.skel-head {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+}
+
+.skel-shoulders {
+  width: 140px;
+  height: 18px;
+  border-radius: 99px;
+}
+
+.skel-torso {
+  width: 90px;
+  height: 80px;
+  border-radius: 8px;
+}
+
+.skel-hips {
+  width: 110px;
+  height: 20px;
+  border-radius: 99px;
+}
+
+.skel-legs {
+  display: flex;
+  gap: 14px;
+}
+
+.skel-leg {
+  width: 36px;
+  height: 110px;
+  border-radius: 6px;
+}
+
+/* Scan line */
+.scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-accent) 30%,
+    rgba(0, 229, 204, 0.8) 50%,
+    var(--color-accent) 70%,
+    transparent 100%
+  );
+  box-shadow: 0 0 12px var(--color-accent);
+  animation: scan-sweep 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.scan-subtitle {
+  font-size: 0.8rem;
+  color: var(--color-text-dim);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
