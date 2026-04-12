@@ -1,14 +1,13 @@
 """
-Claude API integration — generates the 4-week return-to-sport mobility plan.
+AI integration — generates the return-to-sport mobility plan.
 
-Model  : claude-opus-4-6
-Caching: system prompt is cached (stable across all requests)
-Thinking: adaptive (model decides depth per request)
-Streaming: yes — uses get_final_message() to avoid HTTP timeouts
+Primary  : Claude claude-opus-4-6  (Anthropic)
+Hardcoded: _fallback_plan()         — used when Claude fails
 """
 
 import os
 import json
+import traceback
 import anthropic
 from models import JointGap, Exercise, WeekPlan, JointStatus
 
@@ -26,55 +25,44 @@ def _get_client() -> anthropic.Anthropic:
 # This is stable across all sports and users — perfect for prompt caching.
 # Cache hit saves ~90% on this portion of input tokens.
 
-_SYSTEM_PROMPT = """You are a board-certified sports physiotherapist specialising in return-to-sport mobility programs.
+_SYSTEM_PROMPT = """You are a sports physiotherapist generating return-to-sport mobility plans.
 
-TASK
-Given an athlete's mobility gaps and personal profile, produce a personalised progressive return-to-sport exercise plan covering the number of weeks specified.
+RULES
+- Exactly 3 exercises per week — no more, no less.
+- EVERY week MUST use COMPLETELY DIFFERENT exercises — zero repetition across any week of the plan. If an exercise appeared in any previous week, it is FORBIDDEN in subsequent weeks.
+- Difficulty MUST increase every single week: each week's exercises must be measurably harder than the previous week's (more range, more load, more speed, or more sport-specificity).
+- Follow this strict progression arc:
+    Week 1 → passive/assisted range only, zero load
+    Week 2 → active unassisted range, bodyweight or band resistance
+    Week 3 → loaded dynamic movement, multi-planar, controlled instability
+    Week 4+ → sport-specific drills that replicate exact match/game demands
+- Prioritise RED joints, then YELLOW. Adjust for dominant hand when relevant.
+- Per week: 2 avoid items (short phrases, no em-dashes).
+- Keep description to 1 sentence. Keep why to 1 sentence.
 
-PROGRESSION RULES — CRITICAL
-- Every week MUST have DIFFERENT exercises. Never repeat the same exercise across weeks.
-- Each week builds on the previous: increase range, add load, add speed, or add sport-specificity.
-- Week 1: gentle tissue preparation — passive/active-assisted range, low load.
-- Week 2: active mobility — self-resisted, banded, or bodyweight loaded range.
-- Week 3: dynamic mobility — tempo work, multi-planar, controlled instability.
-- Final week(s): sport-specific integration — replicate exact movement demands of the sport.
-- 4–5 exercises per week, 5 for weeks with multiple red joints.
-- Prioritise RED joints first, then YELLOW. GREEN joints need maintenance only.
-- Adjust exercises for dominant hand when relevant (e.g. throwing, serving).
-- Scale intensity to the weeks_to_return value: more weeks = more gradual progressions; fewer weeks = accelerate progression.
-- If athlete weight is provided, adjust load references (e.g. "light resistance band" vs "medium-heavy band").
-
-THINGS TO AVOID — per week, list 3–4 specific movements, positions, or activities that could aggravate the identified mobility deficits at that stage of recovery. Be sport-specific and stage-specific (avoid different things in week 1 vs week 4).
-
-OUTPUT FORMAT
-Return ONLY valid JSON — no markdown, no code fences, no commentary:
+OUTPUT: Return ONLY valid JSON — no markdown, no code fences:
 
 {
   "weeks": [
     {
       "week": 1,
-      "avoid": [
-        "Overhead pressing with compromised shoulder position — risk of impingement given current ROM deficit",
-        "Full-speed throwing or serving — explosive load before tissue is prepared",
-        "Deep end-range stretches past point of pain — can cause micro-tears in restricted tissue",
-        "High-impact jumping or sprinting — joint stress before mobility foundation is built"
-      ],
+      "avoid": ["Overhead pressing", "Full-speed throwing"],
       "exercises": [
         {
           "name": "Exercise Name",
-          "target_joint": "joint_key_from_input",
-          "target_label": "Human Readable Joint Name",
+          "target_joint": "joint_key",
+          "target_label": "Joint Name",
           "status": "red",
-          "sets_reps": "3 × 30 seconds each side",
-          "description": "Clear step-by-step instructions (2–3 sentences)",
-          "why": "Why this specific exercise at this specific week — reference the sport, the ROM gap, and the progression logic"
+          "sets_reps": "3x10",
+          "description": "One sentence how-to.",
+          "why": "One sentence rationale."
         }
       ]
     }
   ]
 }
 
-Valid "status" values: "red", "yellow", "green"."""
+Valid status: "red", "yellow", "green"."""
 
 
 # ── Fallback exercises per joint (used when API is unavailable) ───────────────
@@ -212,9 +200,10 @@ def generate_plan(sport_name: str, gaps: list[JointGap], user_profile: dict | No
         + weight_line
         + f"\nMobility gaps (sorted priority → moderate):\n"
         + "\n".join(gap_lines)
-        + f"\n\nGenerate a {weeks_to_return}-week progressive plan as JSON. "
-        f"Each week must have DIFFERENT exercises — do not repeat any exercise across weeks."
-        + (f" Adjust exercise load and intensity recommendations for an athlete weighing {weight_kg} kg." if weight_kg else "")
+        + f"\n\nGenerate a {weeks_to_return}-week plan. EXACTLY 3 exercises per week, 2 avoid items per week. "
+        f"No exercise may appear more than once across all weeks. Difficulty must increase every week. "
+        f"Keep all text fields brief (1 sentence each). Output only JSON."
+        + (f" Scale load for {weight_kg} kg athlete." if weight_kg else "")
     )
 
     try:
@@ -222,7 +211,7 @@ def generate_plan(sport_name: str, gaps: list[JointGap], user_profile: dict | No
         # get_final_message() collects the full response after streaming completes.
         with client.messages.stream(
             model="claude-opus-4-6",
-            max_tokens=max(8000, weeks_to_return * 800),
+            max_tokens=max(16000, weeks_to_return * 2000),
             thinking={"type": "adaptive"},
             system=[{
                 "type": "text",
@@ -275,8 +264,9 @@ def generate_plan(sport_name: str, gaps: list[JointGap], user_profile: dict | No
             ))
         return weeks
 
-    except Exception:
-        # Any failure — JSON parse error, API error, network issue — use fallback
+    except Exception as e:
+        print(f"[claude_client] Claude generate_plan FAILED: {type(e).__name__}: {e}")
+        traceback.print_exc()
         return _fallback_plan(sport_name, gaps)
 
 
@@ -353,7 +343,7 @@ def generate_sport_preview(sport_name: str, sport_joints: dict) -> list:
     try:
         with client.messages.stream(
             model="claude-opus-4-6",
-            max_tokens=1500,
+            max_tokens=4000,
             thinking={"type": "adaptive"},
             system=[{
                 "type": "text",
