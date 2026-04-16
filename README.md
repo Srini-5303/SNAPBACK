@@ -12,7 +12,7 @@ SNAPBACK measures your joint range of motion against the specific demands of you
 Select sport → Record movements → CV analysis → Gap analysis → Claude plan
 ```
 
-1. **Sport selection** — choose from 10 sports (tennis, soccer, basketball, swimming, running, CrossFit, golf, volleyball, baseball, boxing)
+1. **Sport selection** — choose from 8 sports (tennis, basketball, swimming, CrossFit, golf, volleyball, baseball, boxing)
 2. **Movement recording** — perform 4 sport-specific movements on camera; the CV server runs MediaPipe pose estimation in real time and streams the annotated feed back to the browser
 3. **Gap analysis** — measured ROM (shoulder, elbow, hip, knee — left/right/combined) is compared against clinical sport-demand thresholds; joints are flagged green / yellow / red
 4. **3D hologram** — an interactive Three.js body map renders your joint status with sonar-ring markers and hover HUDs
