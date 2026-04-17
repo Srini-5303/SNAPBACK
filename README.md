@@ -92,6 +92,9 @@ pip install -r requirements.txt
 
 # Create .env file
 echo "ANTHROPIC_API_KEY=sk-ant-..." > .env
+
+# Verify the key works before starting all three servers
+python test_api_key.py
 ```
 
 ### 3. CV server
@@ -111,7 +114,7 @@ curl -L -o pose_landmarker_full.task \
 cd Frontend
 npm install
 
-# Create .env.local
+# Create .env.local (optional — defaults to http://localhost:8000)
 echo "VITE_API_URL=http://localhost:8000" > .env.local
 ```
 
@@ -205,7 +208,7 @@ ROM measurements are compared against sport-specific clinical thresholds derived
 
 ## Demo mode
 
-If the CV server isn't running or no camera is available, the backend falls back to `DEMO_CV_RESULT` in `config.py` — a realistic synthetic session matching the `result_format.json` output shape. The full Claude plan still generates using real API calls.
+If the CV server isn't running or no camera is available, the backend falls back to `DEMO_CV_RESULT` in `config.py` — a realistic synthetic session matching the `result_format.json` output shape. The Claude plan generation still runs using real API calls, provided `ANTHROPIC_API_KEY` is set. If the key is missing or invalid, the plan also falls back to a hardcoded default via `_fallback_plan()` in `claude_client.py`.
 
 ---
 
