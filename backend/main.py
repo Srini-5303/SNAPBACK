@@ -1,27 +1,30 @@
 """
-SNAPBACK / ReMotion — Backend API
+SNAPBACK — Backend API
 
 Endpoints:
-  GET  /api/sports          → list all available sports
-  POST /api/analyze         → run full pipeline and return analysis + plan
+  GET  /api/sports                → list all available sports
+  GET  /api/sport-preview/{sport} → 4 Claude-generated sport exercises (no user data)
+  POST /api/analyze               → CV result → gap analysis (plan optional via skip_plan)
+  POST /api/plan                  → generate personalised progressive plan with user profile
 
 Run:
   uvicorn main:app --reload --port 8000
 """
 
-import anthropic
+from dotenv import load_dotenv
+load_dotenv()
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from config import SPORT_BLUEPRINTS
-from models import AnalyzeRequest, AnalysisResponse
-from pose import get_joint_angles
+from models import AnalyzeRequest, AnalysisResponse, PlanRequest, PlanResponse
+from pose import get_cv_result
 from gap_analysis import compute_gaps
-from claude_client import generate_plan
+from claude_client import generate_plan, generate_sport_preview
 
-app = FastAPI(title="SNAPBACK API", version="0.1.0")
+app = FastAPI(title="SNAPBACK API", version="0.3.0")
 
-# Allow all origins during development — tighten this before production
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -30,69 +33,92 @@ app.add_middleware(
 )
 
 
-# ── Health check ──────────────────────────────────────────────────────────────
-
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
 
-# ── Sports catalogue ──────────────────────────────────────────────────────────
-
 @app.get("/api/sports")
 def list_sports():
-    """Return metadata for all supported sports."""
     return [
-        {
-            "key":   key,
-            "name":  bp["name"],
-            "tag":   bp["tag"],
-            "emoji": bp["emoji"],
-        }
+        {"key": key, "name": bp["name"], "tag": bp["tag"], "emoji": bp["emoji"]}
         for key, bp in SPORT_BLUEPRINTS.items()
     ]
 
 
-# ── Main analysis pipeline ────────────────────────────────────────────────────
+@app.get("/api/sport-preview/{sport}")
+def sport_preview(sport: str):
+    if sport not in SPORT_BLUEPRINTS:
+        raise HTTPException(status_code=400, detail=f"Unknown sport '{sport}'")
+    blueprint = SPORT_BLUEPRINTS[sport]
+    exercises = generate_sport_preview(blueprint["name"], blueprint["joints"])
+    return {"sport": sport, "sport_name": blueprint["name"], "exercises": exercises}
+
 
 @app.post("/api/analyze", response_model=AnalysisResponse)
 def analyze(request: AnalyzeRequest):
     """
-    Full ReMotion pipeline:
-
-    1. Pose analysis   → get joint angles (hardcoded demo until MediaPipe lands)
-    2. Gap analysis    → compare angles to sport blueprint, assign green/yellow/red
-    3. Plan generation → call Claude API for a 4-week return-to-sport program
+    Gap analysis only (or full pipeline when skip_plan=False).
 
     Request body:
-      sport          (str)  — sport key from /api/sports
-      use_demo       (bool) — use hardcoded demo mobility data (default: true)
-      user_mobility  (dict) — optional override: joint_key → ROM in degrees
+      sport       — sport key
+      use_demo    — use demo CV data
+      skip_plan   — if True, return empty plan (plan generated separately via /api/plan)
+      cv_result   — real CV server output
+      user_profile — dominant_hand + weeks_to_return (used in plan if skip_plan=False)
     """
     if request.sport not in SPORT_BLUEPRINTS:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Unknown sport '{request.sport}'. Call /api/sports for valid keys.",
-        )
+        raise HTTPException(status_code=400, detail=f"Unknown sport '{request.sport}'")
 
-    # Step 1 — Pose analysis (stubbed)
-    user_mobility = get_joint_angles(
+    cv_data = get_cv_result(
         use_demo=request.use_demo,
-        provided=request.user_mobility,
+        provided=request.cv_result.model_dump() if request.cv_result else None,
     )
 
-    # Step 2 — Gap analysis (programmatic)
-    gaps, body_map, readiness_score = compute_gaps(request.sport, user_mobility)
+    gaps, body_map, readiness_score = compute_gaps(request.sport, cv_data)
 
-    # Step 3 — Plan generation (Claude API)
-    plan = generate_plan(SPORT_BLUEPRINTS[request.sport]["name"], gaps)
+    if request.skip_plan:
+        plan = []
+    else:
+        profile = request.user_profile.model_dump() if request.user_profile else None
+        plan = generate_plan(SPORT_BLUEPRINTS[request.sport]["name"], gaps, profile)
 
     return AnalysisResponse(
         sport=request.sport,
         sport_name=SPORT_BLUEPRINTS[request.sport]["name"],
-        user_mobility=user_mobility,
+        overall_score=cv_data.get("overall_score", 0.0),
         gaps=gaps,
         body_map=body_map,
         readiness_score=readiness_score,
         plan=plan,
+    )
+
+
+@app.post("/api/plan", response_model=PlanResponse)
+def plan(request: PlanRequest):
+    """
+    Generate a personalised progressive plan after the user answers profile questions.
+
+    Request body:
+      sport        — sport key
+      use_demo     — use demo CV data when no cv_result
+      cv_result    — real CV server output
+      user_profile — { dominant_hand, weeks_to_return }
+    """
+    if request.sport not in SPORT_BLUEPRINTS:
+        raise HTTPException(status_code=400, detail=f"Unknown sport '{request.sport}'")
+
+    cv_data = get_cv_result(
+        use_demo=request.use_demo,
+        provided=request.cv_result.model_dump() if request.cv_result else None,
+    )
+
+    gaps, _, _ = compute_gaps(request.sport, cv_data)
+    profile    = request.user_profile.model_dump() if request.user_profile else None
+    plan_weeks = generate_plan(SPORT_BLUEPRINTS[request.sport]["name"], gaps, profile)
+
+    return PlanResponse(
+        sport=request.sport,
+        sport_name=SPORT_BLUEPRINTS[request.sport]["name"],
+        plan=plan_weeks,
     )
